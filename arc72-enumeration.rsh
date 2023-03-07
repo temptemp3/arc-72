@@ -15,5 +15,5 @@ export const view = {
 export const Mixin = mixin({
   Base: Arc72Core,
   IDs: [Bytes.fromHex(selector)],
-  View: [view],
+  View: [view]
 });

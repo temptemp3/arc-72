@@ -1,25 +1,21 @@
 "reach 0.1";
 "use strict";
 
-// IMPORTS
+import { view as CoreView } from "./arc72-core.rsh";
+import { view as MetadataView } from "./arc72-metadata.rsh";
+import { view as EnumeratableView } from "./arc72-enumeration.rsh";
+import { view as TransferManagementView } from "./arc72-transfer-management.rsh";
 
-//import { Mixin as Core } from "./arc72-core.rsh";
-//import { Mixin as Metadata } from "./arc72-metadata.rsh";
-//import { Mixin as Enumeratable } from "./arc72-enumeration.rsh";
-//import { Mixin as TransferManagement } from "./transfer-management.rsh";
-//import { Mixin } from "./arc72-mixin.rsh";
-
-//import { Mixin as Core } from "./arc72-core.rsh";
-import { Mixin as Metadata } from "./arc72-metadata.rsh";
-import { Mixin as Enumeratable } from "./arc72-enumeration.rsh";
-//import { Mixin as TransferManagement } from "./transfer-management.rsh";
-//export const Mixin = () => Enumeratable(Metadata);
-
-//const Mixin = () => Enumeratable(Metadata);
 export const main = Reach.App(() => {
-  setOptions({ connectors: [ALGO] });
-  const { /*IDs,*/ View: V /*, Events: E, API: A*/ } = Enumeratable(Metadata);
+  setOptions({ connectors: [ETH] });
+  //const { /*IDs,*/ View: V /*, Events: E, API: A*/ } = Enumeratable(Metadata);
   const D = Participant("Deployer", {});
+  const V = View({
+    ...CoreView,
+    ...MetadataView,
+    ...EnumeratableView,
+    ...TransferManagementView,
+  });
   init();
   D.publish();
   V.totalSupply.set(0);
