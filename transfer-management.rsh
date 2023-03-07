@@ -20,7 +20,7 @@ export const events = {
   Approval: eApproval,
   ApprovalForAll: eApprovalForAll,
 };
-const Mixin = mixin({
+export const Mixin = mixin({
   //Base: ARC72,
   IDs: [ Bytes.fromHex(selector) ],
   API: [ api ],
