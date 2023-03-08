@@ -1,6 +1,8 @@
 "reach 0.1";
 "use strict";
 
+import { api, view, events } from "@temptemp3/arc-72#arc-72-v0.1.13r0:index.rsh";
+
 // CONSTANTS
 
 // baseUriLength is the length of ipfs://<v1-CID-in-base32-format>/

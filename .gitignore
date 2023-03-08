@@ -3,3 +3,6 @@ build
 Dockerfile
 package.json
 reach
+.env
+*.sh
+.reach
