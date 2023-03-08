@@ -1,73 +1,172 @@
 "reach 0.1";
 "use strict";
 
-// TODO adminAddress -> manager
-// TODO updateAdmin -> grant
-
 // CONSTANTS
 
 // baseUriLength is the length of ipfs://<v1-CID-in-base32-format>/
 const baseUriLength = 67;
-const metadataUriType = Bytes(256);
 // This NFT is limitted to 10^3 tokens for the sake of the `tokenUri` method to construct a URI.  But this limit could be raised by extending the URI construction.
 const maxNftId = 9999;
+// This is the length of the meta data URI
+const metadataUriByteLength = 256;
+
+// TYPES
+
+export const State = Struct([
+  ["adminAddress", Address], // admin address
+  ["nMinted", UInt256], // number minted
+  ["totalSupply", UInt256], // total supply
+]);
+
+const NftId = UInt256;
+
+const metadataUriType = Bytes(metadataUriByteLength);
+
+const MAddress = Maybe(Address);
+
+// TODO adminAddress -> manager
+// TODO updateAdmin -> grant
+
+// Supported interface
+
+export const SupportedSelector = Bytes.fromHex("0x4e22a3ba");
+export const fSupportsInterface = Fun([Bytes(4)], Bool);
+export const SupportedView = {
+  supportsInterface: fSupportsInterface,
+};
+
+// Admin interface
+
+export const AdminSelector = Bytes.fromHex("0xffffffff");
+export const fCurrentAdmin = Fun([], Address);
+export const AdminView = {
+  currentAdmin: fCurrentAdmin,
+};
+export const fUpdateAdmin = Fun([Address], Null);
+export const AdminAPI = {
+  updateAdmin: fUpdateAdmin,
+};
+
+// Mint interface
+
+export const fMintTo = Fun([Address], NftId);
+export const MintAPI = {
+  mintTo: fMintTo,
+};
+
+// Burn interface
+
+export const fBurn = Fun([NftId], Null);
+export const BurnAPI = {
+  burn: fBurn,
+};
+
+// Core NFT specification interface
+
+export const Arc72CoreSelector = Bytes.fromHex("0x15974096");
+export const fOwnerOf = Fun([NftId], MAddress);
+export const Arc72CoreView = {
+  ownerOf: fOwnerOf,
+};
+export const fTransferFrom = Fun([Address, Address, NftId], Null);
+export const Arc72CoreAPI = {
+  transferFrom: fTransferFrom,
+};
+export const eTransfer = [MAddress, MAddress, NftId];
+export const Arc72CoreEvents = {
+  Transfer: eTransfer,
+};
+
+// Metadata extension interface
+
+export const Arc72MetadataSelector = Bytes.fromHex("0x9112544c");
+export const fTokenURI = Fun([NftId], metadataUriType);
+export const ARC72MetadataView = {
+  tokenURI: fTokenURI,
+};
+
+// Transfer management extension interface
+
+export const Arc72TransferManagementSelector = Bytes.fromHex("0x924d64fb");
+export const fApprove = Fun([Address, NftId], Null);
+export const fSetApprovalForAll = Fun([Address, Bool], Null);
+export const Arc72TransferManagementAPI = {
+  approve: fApprove,
+  setApprovalForAll: fSetApprovalForAll,
+};
+export const vGetApproved = Fun([NftId], MAddress);
+export const vIsApprovedForAll = Fun([MAddress, MAddress], Bool);
+export const Arc72TransferManagementView = {
+  getApproved: vGetApproved,
+  isApprovedForAll: vIsApprovedForAll,
+};
+export const eApproval = [MAddress, MAddress, NftId];
+export const eApprovalForAll = [MAddress, MAddress, Bool];
+export const Arc72TransferManagementEvents = {
+  Approval: eApproval,
+  ApprovalForAll: eApprovalForAll,
+};
+
+// Enumeration extension interface
+
+export const Arc72EnumerationSelector = Bytes.fromHex("0xef470855");
+export const fBalanceOf = Fun([Address], UInt256);
+export const fTotalSupply = Fun([], UInt256);
+export const fTokenByIndex = Fun([UInt256], NftId);
+export const Arc72EnumerationView = {
+  balanceOf: fBalanceOf,
+  totalSupply: fTotalSupply,
+  tokenByIndex: fTokenByIndex,
+};
 
 // FUN
 
 const supportedInterfaces = [
   // ARC-73 (supportsInterface)
-  Bytes.fromHex("0x4e22a3ba"),
+  SupportedSelector,
   // ARC-72 Core
-  Bytes.fromHex("0x15974096"),
+  Arc72CoreSelector,
   // ARC-72 Metadata extension
-  Bytes.fromHex("0x9112544c"),
+  Arc72MetadataSelector,
   // ARC-72 Transfer Management extension
-  Bytes.fromHex("0x924d64fb"),
+  Arc72TransferManagementSelector,
+  // ARC-72 Enumeration extension
+  Arc72EnumerationSelector,
 ];
 const supportsInterface = (interfaces) => (interfaceSelector) => {
   return interfaces.includes(interfaceSelector);
 };
 
-// TYPES
-
-const NftId = UInt256;
-const MAddress = Maybe(Address);
-
 // API
 
-export const fTransferFrom = Fun([Address, Address, NftId], Null);
-export const fApprove = Fun([Address, NftId], Null);
-export const fSetApprovalForAll = Fun([Address, Bool], Null);
-export const fUpdateAdmin = Fun([Address], Null);
-export const fMintTo = Fun([Address], NftId);
-export const fBurn = Fun([NftId], Null);
+export const Arc72API = {
+  ...Arc72CoreAPI,
+  ...Arc72TransferManagementAPI,
+};
 export const api = {
-  transferFrom: fTransferFrom,
-  approve: fApprove,
-  setApprovalForAll: fSetApprovalForAll,
-  updateAdmin: fUpdateAdmin,
-  mintTo: fMintTo,
-  burn: fBurn,
+  ...Arc72API,
+  ...AdminAPI,
+  ...MintAPI,
+  ...BurnAPI,
 };
 
 // VIEW
 
-export const vOwnerOf = Fun([NftId], MAddress);
-export const vTokenURI = Fun([NftId], metadataUriType);
-export const vSupportsInterface = Fun([Bytes(4)], Bool);
-export const vGetApproved = Fun([NftId], MAddress);
-export const vIsApprovedForAll = Fun([MAddress, MAddress], Bool);
-export const vTotalSupply = Fun([], UInt256);
-export const vCurrentAdmin = Fun([], Address);
-// TODO add state
+export const fState = Fun([], State);
+export const StateView = {
+  state: fState,
+};
+export const Arc72View = {
+  ...Arc72CoreView,
+  ...ARC72MetadataView,
+  ...Arc72TransferManagementView,
+  ...Arc72EnumerationView,
+};
 export const view = {
-  ownerOf: vOwnerOf,
-  tokenURI: vTokenURI,
-  supportsInterface: vSupportsInterface,
-  getApproved: vGetApproved,
-  isApprovedForAll: vIsApprovedForAll,
-  totalSupply: vTotalSupply,
-  currentAdmin: vCurrentAdmin,
+  ...Arc72View,
+  ...SupportedView,
+  ...AdminView,
+  ...StateView,
 };
 
 // EVENTS
@@ -76,13 +175,9 @@ export const eLaunch = [];
 export const appEvents = {
   Launch: eLaunch,
 };
-export const eTransfer = [MAddress, MAddress, NftId];
-export const eApproval = [MAddress, MAddress, NftId];
-export const eApprovalForAll = [MAddress, MAddress, Bool];
 export const Arc72Events = {
-  Transfer: eTransfer,
-  Approval: eApproval,
-  ApprovalForAll: eApprovalForAll,
+  ...Arc72CoreEvents,
+  ...Arc72TransferManagementEvents,
 };
 export const events = { ...Arc72Events, ...appEvents };
 
@@ -163,7 +258,7 @@ export const main = Reach.App(() => {
       // ---------------------------------------------
       // helpers
       // ---------------------------------------------
-      const tokenUri = (nftId) => {
+      const tokenURI = (nftId) => {
         check(isSome(nftData[nftId]), "nft must exist");
         const idShort = UInt(nftId, true);
         const digitArr = array(Bytes(1), [
@@ -194,12 +289,15 @@ export const main = Reach.App(() => {
       // initialize view
       // ---------------------------------------------
       V.ownerOf.set((nftId) => getNftOwner(nftId, false));
-      V.tokenURI.set(tokenUri);
+      V.tokenURI.set(tokenURI);
       V.supportsInterface.set(supportsInterface(supportedInterfaces));
       V.getApproved.set((nftId) => getNftApproved(nftId, false));
       V.isApprovedForAll.set(getApprovalForAll);
       V.totalSupply.set(() => s.totalSupply);
       V.currentAdmin.set(() => s.adminAddress);
+      V.balanceOf.set((_) => UInt256(0));
+      V.tokenByIndex.set((_) => NftId(0));
+      V.state.set(() => State.fromObject(s));
       // ---------------------------------------------
     })
     .invariant(balance() === 0)
