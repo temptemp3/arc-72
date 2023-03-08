@@ -1,21 +1,36 @@
 "reach 0.1";
 "use strict";
 
-import { view as CoreView } from "./arc72-core.rsh";
-import { view as MetadataView } from "./arc72-metadata.rsh";
-import { view as EnumeratableView } from "./arc72-enumeration.rsh";
-import { view as TransferManagementView } from "./arc72-transfer-management.rsh";
+import { Mixin as Arc72Core } from "./arc72-core.rsh";
+
+//import { Mixin as Enumeratable } from "./arc72-enumeration.rsh";
+
+const vTotalSupply = UInt;
+const vTokenByIndex = Fun([UInt], UInt);
+export const Enumeratable = mixin({
+  Base: Arc72Core,
+  IDs: [Bytes.fromHex("0x8d5a7006")],
+  View: [
+    {
+      totalSupply: vTotalSupply,
+      tokenByIndex: vTokenByIndex,
+    },
+  ],
+});
+
+//import { Mixin as Metadata } from "./arc72-metadata.rsh";
+
+const fTokenURI = Fun([UInt], StringDyn); // returns a URI for a given tokenID
+export const Metadata = mixin({
+  Base: Arc72Core,
+  IDs: [Bytes.fromHex("0x9112544c")],
+  View: [{ tokenURI: fTokenURI }],
+});
 
 export const main = Reach.App(() => {
-  setOptions({ connectors: [ETH] });
-  //const { /*IDs,*/ View: V /*, Events: E, API: A*/ } = Enumeratable(Metadata);
+  setOptions({ connectors: [ALGO] });
+  const { /*IDs,*/ View: V /*, Events: E, API: A*/ } = Enumeratable(Metadata);
   const D = Participant("Deployer", {});
-  const V = View({
-    ...CoreView,
-    ...MetadataView,
-    ...EnumeratableView,
-    ...TransferManagementView,
-  });
   init();
   D.publish();
   V.totalSupply.set(0);
