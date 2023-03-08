@@ -1,47 +1,115 @@
-'reach 0.1';
-'use strict';
+"reach 0.1";
+"use strict";
+
+// TODO adminAddress -> manager
+// TODO updateAdmin -> grant
+
+// CONSTANTS
 
 // baseUriLength is the length of ipfs://<v1-CID-in-base32-format>/
 const baseUriLength = 67;
 const metadataUriType = Bytes(256);
-const NftId = UInt256;
 // This NFT is limitted to 10^3 tokens for the sake of the `tokenUri` method to construct a URI.  But this limit could be raised by extending the URI construction.
 const maxNftId = 9999;
+
+// FUN
+
+const supportedInterfaces = [
+  // ARC-73 (supportsInterface)
+  Bytes.fromHex("0x4e22a3ba"),
+  // ARC-72 Core
+  Bytes.fromHex("0x15974096"),
+  // ARC-72 Metadata extension
+  Bytes.fromHex("0x9112544c"),
+  // ARC-72 Transfer Management extension
+  Bytes.fromHex("0x924d64fb"),
+];
+const supportsInterface = (interfaces) => (interfaceSelector) => {
+  return interfaces.includes(interfaceSelector);
+};
+
+// TYPES
+
+const NftId = UInt256;
+const MAddress = Maybe(Address);
+
+// API
+
+export const fTransferFrom = Fun([Address, Address, NftId], Null);
+export const fApprove = Fun([Address, NftId], Null);
+export const fSetApprovalForAll = Fun([Address, Bool], Null);
+export const fUpdateAdmin = Fun([Address], Null);
+export const fMintTo = Fun([Address], NftId);
+export const fBurn = Fun([NftId], Null);
+export const api = {
+  transferFrom: fTransferFrom,
+  approve: fApprove,
+  setApprovalForAll: fSetApprovalForAll,
+  updateAdmin: fUpdateAdmin,
+  mintTo: fMintTo,
+  burn: fBurn,
+};
+
+// VIEW
+
+export const vOwnerOf = Fun([NftId], MAddress);
+export const vTokenURI = Fun([NftId], metadataUriType);
+export const vSupportsInterface = Fun([Bytes(4)], Bool);
+export const vGetApproved = Fun([NftId], MAddress);
+export const vIsApprovedForAll = Fun([MAddress, MAddress], Bool);
+export const vTotalSupply = Fun([], UInt256);
+export const vCurrentAdmin = Fun([], Address);
+// TODO add state
+export const view = {
+  ownerOf: vOwnerOf,
+  tokenURI: vTokenURI,
+  supportsInterface: vSupportsInterface,
+  getApproved: vGetApproved,
+  isApprovedForAll: vIsApprovedForAll,
+  totalSupply: vTotalSupply,
+  currentAdmin: vCurrentAdmin,
+};
+
+// EVENTS
+
+export const eLaunch = [];
+export const appEvents = {
+  Launch: eLaunch,
+};
+export const eTransfer = [MAddress, MAddress, NftId];
+export const eApproval = [MAddress, MAddress, NftId];
+export const eApprovalForAll = [MAddress, MAddress, Bool];
+export const Arc72Events = {
+  Transfer: eTransfer,
+  Approval: eApproval,
+  ApprovalForAll: eApprovalForAll,
+};
+export const events = { ...Arc72Events, ...appEvents };
+
+// PARTICIPANTS
+
+const fReady = Fun([], Null);
+const fParams = Object({
+  metadataUriBase: Bytes(baseUriLength),
+});
+const managerInteract = {
+  ready: fReady,
+  params: fParams,
+};
+export const Deployer = () => {
+  return Participant("Manager", managerInteract);
+};
+
+// CONTRACT
 
 export const main = Reach.App(() => {
   setOptions({
     connectors: [ALGO],
   });
-  const D = Participant('Deployer', {
-    ready: Fun([], Null),
-    params: Object({
-      zeroAddress: Address,
-      metadataUriBase: Bytes(baseUriLength),
-    }),
-  });
-  const A = API({
-    transferFrom: Fun([Address, Address, NftId], Null),
-    approve: Fun([Address, NftId], Null),
-    setApprovalForAll: Fun([Address, Bool], Null),
-    updateAdmin: Fun([Address], Null),
-    mintTo: Fun([Address], NftId),
-    burn: Fun([NftId], Null),
-  });
-  const V = View({
-    ownerOf: Fun([NftId], Address),
-    tokenURI: Fun([NftId], metadataUriType),
-    supportsInterface: Fun([Bytes(4)], Bool),
-    getApproved: Fun([NftId], Address),
-    isApprovedForAll: Fun([Address, Address], Bool),
-    totalSupply: Fun([], UInt256),
-    currentAdmin: Fun([], Address),
-
-  });
-  const E = Events({
-    Transfer: [Address, Address, NftId],
-    Approval: [Address, Address, NftId],
-    ApprovalForAll: [Address, Address, Bool],
-  });
+  const D = Deployer();
+  const A = API(api);
+  const V = View(view);
+  const E = Events(events);
 
   init();
   D.only(() => {
@@ -49,43 +117,67 @@ export const main = Reach.App(() => {
   });
   D.publish(params);
 
+  // ---------------------------------------------
   // nftData is [ownerAddress, approvedAddress]
-  const nftData = new Map(NftId, Tuple(Address, Address));
+  // ---------------------------------------------
+  const nftData = new Map(NftId, Tuple(MAddress, MAddress));
   const getNft = (nftId, mustExist) => {
     if (mustExist) {
       check(isSome(nftData[nftId]), "nft must exist");
     }
-    return fromSome(nftData[nftId], [params.zeroAddress, params.zeroAddress]);
-  }
+    return fromSome(nftData[nftId], [MAddress.None(), MAddress.None()]);
+  };
   const getNftOwner = (nftId, mustExist) => getNft(nftId, mustExist)[0];
   const getNftApproved = (nftId, mustExist) => getNft(nftId, mustExist)[1];
+  // ---------------------------------------------
 
-  const operatorData = new Map(Tuple(Address, Address), Bool);
+  // ---------------------------------------------
+  // operatorData is [ownerAddress, operatorAddress]
+  // ---------------------------------------------
+  const operatorData = new Map(Tuple(MAddress, MAddress), Bool);
   const getApprovalForAll = (owner, operator) => {
     return fromSome(operatorData[[owner, operator]], false);
-  }
-
+  };
   const canTransfer = (nftId, addr) => {
     const [owner, controller] = getNft(nftId, true);
-    return addr == owner || addr == controller || getApprovalForAll(owner, addr);
-  }
+    return (
+      (isSome(owner) && addr == fromSome(owner, D)) ||
+      (isSome(controller) && addr == fromSome(controller, D)) ||
+      getApprovalForAll(owner, MAddress.Some(addr))
+    );
+  };
+  // ---------------------------------------------
 
   D.interact.ready();
+  E.Launch();
 
-  const vars = parallelReduce({
+  const initialState = {
     adminAddress: D,
     nMinted: UInt256(0),
     totalSupply: UInt256(0),
-  })
-    .define(() => {
+  };
 
+  // TODO dump view
+  const [s] = parallelReduce([initialState])
+    .define(() => {
+      // ---------------------------------------------
       // helpers
-      const noPayment = () => [0];
+      // ---------------------------------------------
       const tokenUri = (nftId) => {
         check(isSome(nftData[nftId]), "nft must exist");
         const idShort = UInt(nftId, true);
-        const digitArr = array(Bytes(1),
-                               ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9",]);
+        const digitArr = array(Bytes(1), [
+          "0",
+          "1",
+          "2",
+          "3",
+          "4",
+          "5",
+          "6",
+          "7",
+          "8",
+          "9",
+        ]);
         const digit0 = digitArr[idShort % 10];
         const digit1 = digitArr[(idShort / 10) % 10];
         const digit2 = digitArr[(idShort / 100) % 10];
@@ -95,120 +187,138 @@ export const main = Reach.App(() => {
         const digits3 = Bytes.concat(digit3, digits2);
         const uri = Bytes.concat(params.metadataUriBase, digits3);
         return metadataUriType.pad(uri);
-      }
-      const ifaceSelectors = [
-        // ARC-73 (supportsInterface)
-        Bytes.fromHex("0x4e22a3ba"),
-        // ARC-72 Core
-        Bytes.fromHex("0x15974096"),
-        // ARC-72 Metadata extension
-        Bytes.fromHex("0x9112544c"),
-        // ARC-72 Transfer Management extension
-        Bytes.fromHex("0x924d64fb"),
-      ];
-      const supportsInterface = (ifaceSelector) => {
-        return ifaceSelectors.includes(ifaceSelector);
-      }
+      };
+      // ---------------------------------------------
 
-      //views
-      V.ownerOf.set(nftId => getNftOwner(nftId, false));
+      // ---------------------------------------------
+      // initialize view
+      // ---------------------------------------------
+      V.ownerOf.set((nftId) => getNftOwner(nftId, false));
       V.tokenURI.set(tokenUri);
-      V.supportsInterface.set(supportsInterface);
-      V.getApproved.set(nftId => getNftApproved(nftId, false));
+      V.supportsInterface.set(supportsInterface(supportedInterfaces));
+      V.getApproved.set((nftId) => getNftApproved(nftId, false));
       V.isApprovedForAll.set(getApprovalForAll);
-      V.totalSupply.set(() => vars.totalSupply);
-      V.currentAdmin.set(() => vars.adminAddress);
+      V.totalSupply.set(() => s.totalSupply);
+      V.currentAdmin.set(() => s.adminAddress);
+      // ---------------------------------------------
     })
     .invariant(balance() === 0)
     .while(true)
+    // (admin) api: updateAdmin (address) -> null
+    // - admin can change admin
     .api_(A.updateAdmin, (newAdmin) => {
-      check(vars.adminAddress == this, "must be admin")
+      check(s.adminAddress == this, "must be admin to update admin");
       return [
-        noPayment(),
         (k) => {
           k(null);
-          return {...vars, adminAddress: newAdmin};
+          return [{ ...s, adminAddress: newAdmin }];
         },
       ];
     })
+    // (admin) api: mintTo (address) -> nftId
+    // - admin can mint to any address
     .api_(A.mintTo, (firstOwner) => {
-      check(vars.adminAddress == this, "must be admin");
-      check(vars.nMinted <= UInt256(maxNftId), "already minted max NFT")
-      const nftId = vars.nMinted + UInt256(1);
-      const newTotalSupply = vars.totalSupply + UInt256(1);
+      check(s.adminAddress == this, "must be admin to mint to address");
+      check(s.nMinted <= UInt256(maxNftId), "already minted max NFT");
+      const nftId = s.nMinted + UInt256(1);
+      const newTotalSupply = s.totalSupply + UInt256(1);
       return [
-        noPayment(),
         (k) => {
-          nftData[nftId] = [firstOwner, params.zeroAddress];
-          E.Transfer(params.zeroAddress, firstOwner, nftId);
+          nftData[nftId] = [MAddress.Some(firstOwner), MAddress.None()];
+          E.Transfer(MAddress.None(), MAddress.Some(firstOwner), nftId);
           k(nftId);
-          return {
-            ...vars,
-            nMinted: nftId,
-            totalSupply: newTotalSupply,
-          };
+          return [
+            {
+              ...s,
+              nMinted: nftId,
+              totalSupply: newTotalSupply,
+            },
+          ];
         },
       ];
     })
-    .api_(A.approve, (controller, nftId) => {
-      const owner = getNftOwner(nftId, true);
-      check(this == owner, "must be nft owner");
-      return [
-        noPayment(),
-        (k) => {
-          nftData[nftId] = [owner, controller];
-          E.Approval(owner, controller, nftId);
-          k(null);
-          return vars;
-        },
-      ];
-    })
-    .api_(A.setApprovalForAll, (operator, tOrF) => {
-      return [
-        noPayment(),
-        (k) => {
-          if (tOrF) {
-            operatorData[[this, operator]] = true;
-          } else {
-            delete operatorData[[this, operator]];
-          }
-          E.ApprovalForAll(this, operator, tOrF);
-          k(null);
-          return vars;
-        },
-      ];
-    })
+    // (owner | operator) api: transferFrom (address, address, nftId) -> null
+    // - owner or approved operator can transfer to any address
     .api_(A.transferFrom, (oldOwner, newOwner, nftId) => {
       const oldOwnerReal = getNftOwner(nftId, true);
-      check(oldOwnerReal == oldOwner, "owner specified in API must be correct");
-      check(canTransfer(nftId, this), "must be nft owner or approved operator");
+      check(oldOwner != newOwner, "must transfer to different address");
+      check(
+        isNone(oldOwnerReal) || newOwner != fromSome(oldOwnerReal, D),
+        "must transfer to different real address"
+      );
+      check(
+        isNone(oldOwnerReal) || oldOwner == fromSome(oldOwnerReal, D),
+        "nft must exists and owner specified in must be correct"
+      );
+      check(
+        canTransfer(nftId, this),
+        "must be existing nft owner or approved operator"
+      );
       return [
-        noPayment(),
         (k) => {
-          nftData[nftId] = [newOwner, params.zeroAddress];
-          E.Transfer(oldOwner, newOwner, nftId);
+          nftData[nftId] = [MAddress.Some(newOwner), MAddress.None()];
+          E.Transfer(MAddress.Some(oldOwner), MAddress.Some(newOwner), nftId);
           k(null);
-          return vars;
+          return [s];
         },
       ];
     })
+    // (owner | operator) api: burn (nftId) -> null
+    // - owner or operator can burn nft
     .api_(A.burn, (nftId) => {
       const owner = getNftOwner(nftId, true);
-      check(canTransfer(nftId, this), "must be nft owner or approved operator");
+      check(
+        canTransfer(nftId, this),
+        "must be existing nft owner or approved operator to burn"
+      );
       return [
-        noPayment(),
         (k) => {
           delete nftData[nftId];
-          E.Transfer(owner, params.zeroAddress, nftId);
+          E.Transfer(owner, MAddress.None(), nftId);
           k(null);
-          return {
-            ...vars,
-            totalSupply: vars.totalSupply - UInt256(1),
-          };
+          return [
+            {
+              ...s,
+              totalSupply: s.totalSupply - UInt256(1),
+            },
+          ];
         },
       ];
     })
-  ;
+    // (owner) api: approve
+    // - owner can approve controller
+    .api_(A.approve, (controller, nftId) => {
+      const owner = getNftOwner(nftId, true);
+      check(isSome(owner), "nft must exist");
+      check(
+        this == fromSome(owner, D),
+        "must be nft owner to approve controller"
+      );
+      return [
+        (k) => {
+          nftData[nftId] = [owner, MAddress.Some(controller)];
+          E.Approval(owner, MAddress.Some(controller), nftId);
+          k(null);
+          return [s];
+        },
+      ];
+    })
+    // (anyone) api: setApprovalForAll (address, bool) -> null
+    // - anyone can approve an operator
+    .api_(A.setApprovalForAll, (operator, tOrF) => {
+      return [
+        (k) => {
+          if (tOrF) {
+            operatorData[[MAddress.Some(this), MAddress.Some(operator)]] = true;
+          } else {
+            delete operatorData[[MAddress.Some(this), MAddress.Some(operator)]];
+          }
+          E.ApprovalForAll(MAddress.Some(this), MAddress.Some(operator), tOrF);
+          k(null);
+          return [s];
+        },
+      ];
+    });
   commit();
   exit();
 });
