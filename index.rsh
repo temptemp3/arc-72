@@ -24,9 +24,6 @@ export const metadataUriType = Bytes(metadataUriByteLength);
 
 export const MAddress = Maybe(Address);
 
-// TODO adminAddress -> manager
-// TODO updateAdmin -> grant
-
 // Supported interface
 
 export const SupportedSelector = Bytes.fromHex("0x4e22a3ba");
@@ -34,6 +31,21 @@ export const fSupportsInterface = Fun([Bytes(4)], Bool);
 export const SupportedView = {
   supportsInterface: fSupportsInterface,
 };
+export const supportsInterface = (interfaces) => (interfaceSelector) => {
+  return interfaces.includes(interfaceSelector);
+};
+const supportedInterfaces = [
+  // ARC-73 (supportsInterface)
+  SupportedSelector,
+  // ARC-72 Core
+  Arc72CoreSelector,
+  // ARC-72 Metadata extension
+  Arc72MetadataSelector,
+  // ARC-72 Transfer Management extension
+  Arc72TransferManagementSelector,
+  // ARC-72 Enumeration extension
+  Arc72EnumerationSelector,
+];
 
 // Admin interface
 
@@ -56,7 +68,7 @@ export const MintAPI = {
 export const rMintTo = Fun([Contract, Address], NftId);
 export const RMintAPI = {
   mintTo: rMintTo,
-}
+};
 
 // Burn interface
 
@@ -121,24 +133,6 @@ export const Arc72EnumerationView = {
   balanceOf: fBalanceOf,
   totalSupply: fTotalSupply,
   tokenByIndex: fTokenByIndex,
-};
-
-// FUN
-
-const supportedInterfaces = [
-  // ARC-73 (supportsInterface)
-  SupportedSelector,
-  // ARC-72 Core
-  Arc72CoreSelector,
-  // ARC-72 Metadata extension
-  Arc72MetadataSelector,
-  // ARC-72 Transfer Management extension
-  Arc72TransferManagementSelector,
-  // ARC-72 Enumeration extension
-  Arc72EnumerationSelector,
-];
-const supportsInterface = (interfaces) => (interfaceSelector) => {
-  return interfaces.includes(interfaceSelector);
 };
 
 // API
