@@ -34,18 +34,6 @@ export const SupportedView = {
 export const supportsInterface = (interfaces) => (interfaceSelector) => {
   return interfaces.includes(interfaceSelector);
 };
-const supportedInterfaces = [
-  // ARC-73 (supportsInterface)
-  SupportedSelector,
-  // ARC-72 Core
-  Arc72CoreSelector,
-  // ARC-72 Metadata extension
-  Arc72MetadataSelector,
-  // ARC-72 Transfer Management extension
-  Arc72TransferManagementSelector,
-  // ARC-72 Enumeration extension
-  Arc72EnumerationSelector,
-];
 
 // Admin interface
 
@@ -192,6 +180,21 @@ const managerInteract = {
 export const Deployer = () => {
   return Participant("Manager", managerInteract);
 };
+
+// SUPPORTED
+
+const supportedInterfaces = [
+  // ARC-73 (supportsInterface)
+  SupportedSelector,
+  // ARC-72 Core
+  Arc72CoreSelector,
+  // ARC-72 Metadata extension
+  Arc72MetadataSelector,
+  // ARC-72 Transfer Management extension
+  Arc72TransferManagementSelector,
+  // ARC-72 Enumeration extension
+  Arc72EnumerationSelector,
+];
 
 // CONTRACT
 
