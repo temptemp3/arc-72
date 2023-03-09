@@ -18,11 +18,11 @@ export const State = Struct([
   ["totalSupply", UInt256], // total supply
 ]);
 
-const NftId = UInt256;
+export const NftId = UInt256;
 
-const metadataUriType = Bytes(metadataUriByteLength);
+export const metadataUriType = Bytes(metadataUriByteLength);
 
-const MAddress = Maybe(Address);
+export const MAddress = Maybe(Address);
 
 // TODO adminAddress -> manager
 // TODO updateAdmin -> grant
@@ -53,6 +53,10 @@ export const fMintTo = Fun([Address], NftId);
 export const MintAPI = {
   mintTo: fMintTo,
 };
+export const rMintTo = Fun([Contract, Address], NftId);
+export const RMintAPI = {
+  mintTo: rMintTo,
+}
 
 // Burn interface
 
