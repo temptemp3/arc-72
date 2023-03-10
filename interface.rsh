@@ -1,42 +1,25 @@
 "reach 0.1";
 "use strict";
 
-import { fMintTo, NftId } from "@temptemp3/arc-72#arc-72-v0.1.13r0:index.rsh";
+import {
+  SupportedSelector,
+  supportsInterface,
+  SupportedView,
+  RMintAPI as MintAPI,
+  rMintTo,
+  RAdminAPI as AdminAPI,
+  rUpdateAdmin
+} from "@temptemp3/arc-72#arc-72-v0.1.13r5:index.rsh";
 
-// Supported interface
+// CONSTANTS
 
-export const SupportedSelector = Bytes.fromHex("0x4e22a3ba");
-export const fSupportsInterface = Fun([Bytes(4)], Bool);
-export const SupportedView = {
-  supportsInterface: fSupportsInterface,
-};
+const SERIAL_VER = 0;
 
 // TYPES
 
-export const State = Struct([
-  ["nMinted", UInt256],
-]);
+export const State = Struct([["nMinted", UInt256]]);
 
 export const Params = Object({});
-
-// FUN
-
-const supportedInterfaces = [
-  SupportedSelector,
-];
-const supportsInterface = (interfaces) => (interfaceSelector) => {
-  return interfaces.includes(interfaceSelector);
-};
-
-// REMOTE FUN
-
-const rMintTo = (ctc, addr, addrs) => {
-  const r = remote(ctc, { mintTo: fMintTo });
-  return r.mintTo(addr, addrs);
-};
-
-// arc72 mintTo
-// arc72 updateManager
 
 // VIEW
 
@@ -50,11 +33,9 @@ export const view = {
 
 // API
 
-const RMintAPI = {
-  mintTo: Fun([Contract, Address], NftId),
-}
 export const api = {
-  ...RMintAPI
+  ...MintAPI,
+  ...AdminAPI,
 };
 
 // EVENTS
@@ -66,6 +47,10 @@ export const appEvents = {
 export const events = {
   ...appEvents,
 };
+
+// SUPPORTED
+
+const supportedInterfaces = [SupportedSelector];
 
 // CONTRACT
 
@@ -80,20 +65,24 @@ export const Api = () => [API(api)];
 export const Event = () => [Events(events)];
 export const Options = { connectors: [ALGO] };
 export const App = (map) => {
-  const [_, _, [M], [V], [A], [E]] = map;
+  const [{ amt, ttl }, [addr, _], [M], [V], [A], [E]] = map;
   M.only(() => {
     const params = declassify(interact.getParams());
   });
-  M.publish(params);
-
-  // initialize maps 
-  // define function using maps
+  M.publish(params)
+    .pay([amt + SERIAL_VER])
+    .timeout(relativeTime(ttl), () => {
+      Anybody.publish();
+      commit();
+      exit();
+    });
+  transfer(amt + SERIAL_VER).to(addr);
 
   M.interact.ready();
   E.Launch();
 
   const initialState = {
-    nMinted: UInt256(0)
+    nMinted: UInt256(0),
   };
 
   V.supportsInterface.set(supportsInterface(supportedInterfaces));
@@ -105,19 +94,29 @@ export const App = (map) => {
     })
     .invariant(balance() == 0, "balance accurate")
     .while(true)
-    // api: mintTo
+    .api_(A.updateAdmin, (ctc, addres) => {
+      return [
+        (k) => {
+          k(null);
+          rUpdateAdmin(ctc, addres);
+          return [s];
+        },
+      ];
+    })
+    // (remote) api: mintTo (contract, address) -> nftId
     // - mint tokens to a user
     .api_(A.mintTo, (ctc, address) => {
       return [
         (k) => {
-          const i = rMintTo(ctc, address, [address]);
-          k(i);
-          return [{
-            nMinted: s.nMinted + 1
-          }];
+          k(rMintTo(ctc, address));
+          return [
+            {
+              nMinted: s.nMinted + UInt256(1),
+            },
+          ];
         },
       ];
-    })
+    });
   commit();
   exit();
 };
