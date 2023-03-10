@@ -37,7 +37,6 @@ export const supportsInterface = (interfaces) => (interfaceSelector) => {
 
 // Admin interface
 
-export const AdminSelector = Bytes.fromHex("0xffffffff");
 export const fCurrentAdmin = Fun([], Address);
 export const AdminView = {
   currentAdmin: fCurrentAdmin,
@@ -45,6 +44,14 @@ export const AdminView = {
 export const fUpdateAdmin = Fun([Address], Null);
 export const AdminAPI = {
   updateAdmin: fUpdateAdmin,
+};
+export const rfUpdateAdmin = Fun([Contract, Address], Null);
+export const RAdminAPI = {
+  updateAdmin: rfUpdateAdmin,
+};
+export const rUpdateAdmin = (ctc, address) => {
+  const r = remote(ctc, { updateAdmin: fUpdateAdmin });
+  return r.updateAdmin(address);
 };
 
 // Mint interface
