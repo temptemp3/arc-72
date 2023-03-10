@@ -53,9 +53,13 @@ export const fMintTo = Fun([Address], NftId);
 export const MintAPI = {
   mintTo: fMintTo,
 };
-export const rMintTo = Fun([Contract, Address], NftId);
+export const rfMintTo = Fun([Contract, Address], NftId);
 export const RMintAPI = {
-  mintTo: rMintTo,
+  mintTo: rfMintTo,
+};
+export const rMintTo = (ctc, address) => {
+  const r = remote(ctc, { mintTo: fMintTo });
+  return r.mintTo(address);
 };
 
 // Burn interface
