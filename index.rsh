@@ -26,10 +26,10 @@ export const MAddress = Maybe(Address);
 
 // Supported interface
 
-export const SupportedSelector = Bytes.fromHex("0x4e22a3ba");
+//export const SupportedSelector = Bytes.fromHex("0x4e22a3ba");
 export const fSupportsInterface = Fun([Bytes(4)], Bool);
 export const SupportedView = {
-  supportsInterface: fSupportsInterface,
+  //supportsInterface: fSupportsInterface,
 };
 export const supportsInterface = (interfaces) => (interfaceSelector) => {
   return interfaces.includes(interfaceSelector);
@@ -78,7 +78,7 @@ export const BurnAPI = {
 
 // Core NFT specification interface
 
-export const Arc72CoreSelector = Bytes.fromHex("0x15974096");
+//export const Arc72CoreSelector = Bytes.fromHex("0x15974096");
 export const fOwnerOf = Fun([NftId], MAddress);
 export const Arc72CoreView = {
   ownerOf: fOwnerOf,
@@ -94,7 +94,7 @@ export const Arc72CoreEvents = {
 
 // Metadata extension interface
 
-export const Arc72MetadataSelector = Bytes.fromHex("0x9112544c");
+//export const Arc72MetadataSelector = Bytes.fromHex("0x9112544c");
 export const fTokenURI = Fun([NftId], metadataUriType);
 export const ARC72MetadataView = {
   tokenURI: fTokenURI,
@@ -102,7 +102,7 @@ export const ARC72MetadataView = {
 
 // Transfer management extension interface
 
-export const Arc72TransferManagementSelector = Bytes.fromHex("0x924d64fb");
+//export const Arc72TransferManagementSelector = Bytes.fromHex("0x924d64fb");
 export const fApprove = Fun([Address, NftId], Null);
 export const fSetApprovalForAll = Fun([Address, Bool], Null);
 export const Arc72TransferManagementAPI = {
@@ -124,7 +124,7 @@ export const Arc72TransferManagementEvents = {
 
 // Enumeration extension interface
 
-export const Arc72EnumerationSelector = Bytes.fromHex("0xef470855");
+//export const Arc72EnumerationSelector = Bytes.fromHex("0xef470855");
 export const fBalanceOf = Fun([Address], UInt256);
 export const fTotalSupply = Fun([], UInt256);
 export const fTokenByIndex = Fun([UInt256], NftId);
@@ -195,6 +195,7 @@ export const Deployer = () => {
 // SUPPORTED
 
 const supportedInterfaces = [
+  /*
   // ARC-73 (supportsInterface)
   SupportedSelector,
   // ARC-72 Core
@@ -205,6 +206,7 @@ const supportedInterfaces = [
   Arc72TransferManagementSelector,
   // ARC-72 Enumeration extension
   Arc72EnumerationSelector,
+  */
 ];
 
 // CONTRACT
@@ -302,7 +304,7 @@ export const main = Reach.App(() => {
       // ---------------------------------------------
       V.ownerOf.set((nftId) => getNftOwner(nftId, false));
       V.tokenURI.set(tokenURI);
-      V.supportsInterface.set(supportsInterface(supportedInterfaces));
+      //V.supportsInterface.set(supportsInterface(supportedInterfaces));
       V.getApproved.set((nftId) => getNftApproved(nftId, false));
       V.isApprovedForAll.set(getApprovalForAll);
       V.totalSupply.set(() => s.totalSupply);
