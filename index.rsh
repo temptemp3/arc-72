@@ -10,6 +10,9 @@ const maxNftId = 9999;
 // This is the length of the meta data URI
 const metadataUriByteLength = 256;
 
+const BOX_INDEX_NFT_DATA = 0;
+const BOX_INDEX_OPERATOR_DATA = 1;
+
 // TYPES
 
 export const State = Struct([
