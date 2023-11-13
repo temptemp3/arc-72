@@ -1,3 +1,8 @@
+# OpenARC72
+
+ERC721 like token on AVM (Algorand + Voi)
+
+---
 
 Algorand Smart Contract NFT (ARC-72)
 
