@@ -27,17 +27,6 @@ export const metadataUriType = Bytes(metadataUriByteLength);
 
 export const MAddress = Maybe(Address);
 
-// Supported interface
-
-export const SupportedSelector = Bytes.fromHex("0x4e22a3ba");
-export const fSupportsInterface = Fun([Bytes(4)], Bool);
-export const SupportedView = {
-  supportsInterface: fSupportsInterface,
-};
-export const supportsInterface = (interfaces) => (interfaceSelector) => {
-  return interfaces.includes(interfaceSelector);
-};
-
 // Admin interface
 
 export const fCurrentAdmin = Fun([], Address);
@@ -79,51 +68,53 @@ export const BurnAPI = {
   burn: fBurn,
 };
 
-// Core NFT specification interface
+// ARC72 - Core NFT specification interface
 
-export const Arc72CoreSelector = Bytes.fromHex("0x15974096");
+export const Arc72CoreSelector = Bytes.fromHex("0x53f02a40"); // TODO validate this
 export const fOwnerOf = Fun([NftId], MAddress);
 export const Arc72CoreView = {
-  ownerOf: fOwnerOf,
+  arc72_ownerOf: fOwnerOf,
 };
 export const fTransferFrom = Fun([Address, Address, NftId], Null);
 export const Arc72CoreAPI = {
-  transferFrom: fTransferFrom,
+  arc72_transferFrom: fTransferFrom,
 };
 export const eTransfer = [MAddress, MAddress, NftId];
 export const Arc72CoreEvents = {
-  Transfer: eTransfer,
+  arc72_Transfer: eTransfer,
 };
 
-// Metadata extension interface
+// ARC72 - Metadata extension interface
 
-export const Arc72MetadataSelector = Bytes.fromHex("0x9112544c");
+export const Arc72MetadataSelector = Bytes.fromHex("0xc3c1f000"); // TODO validate this
 export const fTokenURI = Fun([NftId], metadataUriType);
 export const ARC72MetadataView = {
-  tokenURI: fTokenURI,
+  arc72_tokenURI: fTokenURI,
 };
 
-// Transfer management extension interface
+// ARC72 - Transfer management extension interface
 
-export const Arc72TransferManagementSelector = Bytes.fromHex("0x924d64fb");
+export const Arc72TransferManagementSelector = Bytes.fromHex("0xb9c6f696"); // TODO validate this
 export const fApprove = Fun([Address, NftId], Null);
 export const fSetApprovalForAll = Fun([Address, Bool], Null);
 export const Arc72TransferManagementAPI = {
-  approve: fApprove,
-  setApprovalForAll: fSetApprovalForAll,
+  arc72_approve: fApprove,
+  arc72_setApprovalForAll: fSetApprovalForAll,
 };
 export const vGetApproved = Fun([NftId], MAddress);
 export const vIsApprovedForAll = Fun([MAddress, MAddress], Bool);
 export const Arc72TransferManagementView = {
-  getApproved: vGetApproved,
-  isApprovedForAll: vIsApprovedForAll,
+  arc72_getApproved: vGetApproved,
+  arc72_isApprovedForAll: vIsApprovedForAll,
 };
 export const eApproval = [MAddress, MAddress, NftId];
 export const eApprovalForAll = [MAddress, MAddress, Bool];
 export const Arc72TransferManagementEvents = {
-  Approval: eApproval,
-  ApprovalForAll: eApprovalForAll,
+  arc72_Approval: eApproval,
+  arc72_ApprovalForAll: eApprovalForAll,
 };
+
+
 
 // Enumeration extension interface
 
@@ -132,10 +123,22 @@ export const fBalanceOf = Fun([Address], UInt256);
 export const fTotalSupply = Fun([], UInt256);
 export const fTokenByIndex = Fun([UInt256], NftId);
 export const Arc72EnumerationView = {
-  balanceOf: fBalanceOf,
-  totalSupply: fTotalSupply,
-  tokenByIndex: fTokenByIndex,
+  arc72_balanceOf: fBalanceOf,
+  arc72_totalSupply: fTotalSupply,
+  arc72_tokenByIndex: fTokenByIndex,
 };
+
+// Supported interface
+
+export const ARC73SupportedSelector = Bytes.fromHex("0x4e22a3ba"); // TODO validate this
+export const fSupportsInterface = Fun([Bytes(4)], Bool);
+export const ARC73SupportedView = {
+  arc73_supportsInterface: fSupportsInterface,
+};
+export const supportsInterface = (interfaces) => (interfaceSelector) => {
+  return interfaces.includes(interfaceSelector);
+};
+
 
 // API
 
@@ -164,7 +167,7 @@ export const Arc72View = {
 };
 export const view = {
   ...Arc72View,
-  ...SupportedView,
+  ...ARC73SupportedView,
   ...AdminView,
   ...StateView,
 };
@@ -199,7 +202,7 @@ export const Deployer = () => {
 
 const supportedInterfaces = [
   // ARC-73 (supportsInterface)
-  SupportedSelector,
+  ARC73SupportedSelector,
   // ARC-72 Core
   Arc72CoreSelector,
   // ARC-72 Metadata extension
@@ -303,15 +306,15 @@ export const main = Reach.App(() => {
       // ---------------------------------------------
       // initialize view
       // ---------------------------------------------
-      V.ownerOf.set((nftId) => getNftOwner(nftId, false));
-      V.tokenURI.set(tokenURI);
-      V.supportsInterface.set(supportsInterface(supportedInterfaces));
-      V.getApproved.set((nftId) => getNftApproved(nftId, false));
-      V.isApprovedForAll.set(getApprovalForAll);
-      V.totalSupply.set(() => s.totalSupply);
+      V.arc72_ownerOf.set((nftId) => getNftOwner(nftId, false));
+      V.arc72_tokenURI.set(tokenURI);
+      V.arc72_getApproved.set((nftId) => getNftApproved(nftId, false));
+      V.arc72_isApprovedForAll.set(getApprovalForAll);
+      V.arc72_totalSupply.set(() => s.totalSupply);
+      V.arc72_balanceOf.set((_) => UInt256(0));
+      V.arc72_tokenByIndex.set((_) => NftId(0));
+      V.arc73_supportsInterface.set(supportsInterface(supportedInterfaces));
       V.currentAdmin.set(() => s.adminAddress);
-      V.balanceOf.set((_) => UInt256(0));
-      V.tokenByIndex.set((_) => NftId(0));
       V.state.set(() => State.fromObject(s));
       // ---------------------------------------------
     })
@@ -338,7 +341,7 @@ export const main = Reach.App(() => {
       return [
         (k) => {
           nftData[nftId] = [MAddress.Some(firstOwner), MAddress.None()];
-          E.Transfer(MAddress.None(), MAddress.Some(firstOwner), nftId);
+          E.arc72_Transfer(MAddress.None(), MAddress.Some(firstOwner), nftId);
           k(nftId);
           return [
             {
@@ -352,7 +355,7 @@ export const main = Reach.App(() => {
     })
     // (owner | operator) api: transferFrom (address, address, nftId) -> null
     // - owner or approved operator can transfer to any address
-    .api_(A.transferFrom, (oldOwner, newOwner, nftId) => {
+    .api_(A.arc72_transferFrom, (oldOwner, newOwner, nftId) => {
       const oldOwnerReal = getNftOwner(nftId, true);
       check(oldOwner != newOwner, "must transfer to different address");
       check(
@@ -370,7 +373,7 @@ export const main = Reach.App(() => {
       return [
         (k) => {
           nftData[nftId] = [MAddress.Some(newOwner), MAddress.None()];
-          E.Transfer(MAddress.Some(oldOwner), MAddress.Some(newOwner), nftId);
+          E.arc72_Transfer(MAddress.Some(oldOwner), MAddress.Some(newOwner), nftId);
           k(null);
           return [s];
         },
@@ -387,7 +390,7 @@ export const main = Reach.App(() => {
       return [
         (k) => {
           delete nftData[nftId];
-          E.Transfer(owner, MAddress.None(), nftId);
+          E.arc72_Transfer(owner, MAddress.None(), nftId);
           k(null);
           return [
             {
@@ -400,7 +403,7 @@ export const main = Reach.App(() => {
     })
     // (owner) api: approve
     // - owner can approve controller
-    .api_(A.approve, (controller, nftId) => {
+    .api_(A.arc72_approve, (controller, nftId) => {
       const owner = getNftOwner(nftId, true);
       check(isSome(owner), "nft must exist");
       check(
@@ -410,7 +413,7 @@ export const main = Reach.App(() => {
       return [
         (k) => {
           nftData[nftId] = [owner, MAddress.Some(controller)];
-          E.Approval(owner, MAddress.Some(controller), nftId);
+          E.arc72_Approval(owner, MAddress.Some(controller), nftId);
           k(null);
           return [s];
         },
@@ -418,7 +421,7 @@ export const main = Reach.App(() => {
     })
     // (anyone) api: setApprovalForAll (address, bool) -> null
     // - anyone can approve an operator
-    .api_(A.setApprovalForAll, (operator, tOrF) => {
+    .api_(A.arc72_setApprovalForAll, (operator, tOrF) => {
       return [
         (k) => {
           if (tOrF) {
@@ -426,7 +429,7 @@ export const main = Reach.App(() => {
           } else {
             delete operatorData[[MAddress.Some(this), MAddress.Some(operator)]];
           }
-          E.ApprovalForAll(MAddress.Some(this), MAddress.Some(operator), tOrF);
+          E.arc72_ApprovalForAll(MAddress.Some(this), MAddress.Some(operator), tOrF);
           k(null);
           return [s];
         },
