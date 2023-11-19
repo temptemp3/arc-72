@@ -8,11 +8,7 @@ Algorand Smart Contract NFT (ARC-72)
 
 [Spec](https://github.com/algorandfoundation/ARCs/blob/main/ARCs/arc-0072.md)
 
-NOTES
-
-(1) "Zero Address" as MAddress (Maybe Address) None
-
-Prefer approach because it does not require that the deployer provide the zero address.
+---
 
 CHANGELOG
 
