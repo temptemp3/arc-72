@@ -67,20 +67,27 @@ export const ARC72 = Reach.App(() => {
     arc72_transferFrom: Fun([Address, Address, UInt256], Null),
     // ARC72 Transfer Management Extension API
     arc72_approve: Fun([Address, UInt256], Null),
-    arc72_setApprovalForAll: Fun([Address, Bool], Null),
+    arc72_setApprovalForAll: Fun([Address, Bool], Null), // requires mod: byte to bool in teal
     // Admin API
     grant: Fun([Address], Null),
     // Mint API
     mintTo: Fun([Address], UInt256),
     // Burn API
     burn: Fun([UInt256], Null),
+    // Touch API
+    touch: Fun([], Null),
+    // Box API
+    deleteNftDataBox: Fun([UInt256], Null),
+    deleteOperatorDataBox: Fun([Address, Address], Null),
+    // Close API
+    close: Fun([], Null),
   });
   const V = View({
     // ARC72 Core View
     arc72_ownerOf: Fun([UInt256], Address),
     // ARC72 Transfer Management Extension View
     arc72_getApproved: Fun([UInt256], Address),
-    arc72_isApprovedForAll: Fun([Address, Address], Bool),
+    arc72_isApprovedForAll: Fun([Address, Address], Bool), // requires mod: byte to bool in teal
     // ARC72 Enumeration Extension View
     arc72_balanceOf: Fun([Address], UInt256),
     arc72_totalSupply: Fun([], UInt256),
@@ -99,7 +106,7 @@ export const ARC72 = Reach.App(() => {
     arc72_Transfer: [Address, Address, UInt256],
     // ARC72 Transfer Management Extension Events
     arc72_Approval: [Address, Address, UInt256],
-    arc72_ApprovalForAll: [Address, Address, Bool],
+    arc72_ApprovalForAll: [Address, Address, Bool], // requires mod: byte to bool in teal
   });
   init();
   D.only(() => {
@@ -156,9 +163,13 @@ export const ARC72 = Reach.App(() => {
   D.interact.ready(getContract());
 
   const initialState = {
+    // HOT
     manager: D,
     nMinted: UInt256(0),
     totalSupply: UInt256(0),
+    // COLD
+    zeroAddress: p.zeroAddress,
+    metadataUriBase: p.metadataUriBase,
   };
 
   const [s] = parallelReduce([initialState])
@@ -346,6 +357,53 @@ export const ARC72 = Reach.App(() => {
               totalSupply: s.totalSupply - UInt256(1),
             },
           ];
+        },
+      ];
+    })
+    // (anyone) api: touch -> null
+    // - anyone can touch
+    .api_(A.touch, () => {
+      return [
+        (k) => {
+          const ut = getUntrackedFunds();
+          transfer(ut).to(s.manager);
+          k(null);
+          return [s];
+        },
+      ];
+    })
+    // (manager) api: deleteNftDataBox (nftId) -> null
+    // - manager can delete nft data box
+    .api_(A.deleteNftDataBox, (tokenId) => {
+      check(isManager(this), "must be manager to delete nft data box");
+      return [
+        (k) => {
+          delete nftData[tokenId];
+          k(null);
+          return [s];
+        },
+      ];
+    })
+    // (manager) api: deleteOperatorDataBox (owner, operator) -> null
+    // - manager can delete operator data box
+    .api_(A.deleteOperatorDataBox, (owner, operator) => {
+      check(isManager(this), "must be manager to delete operator data box");
+      return [
+        (k) => {
+          delete operatorData[[owner, operator]];
+          k(null);
+          return [s];
+        },
+      ];
+    })
+    // api: close -> null
+    // - manager can close (dev-only)
+    .api_(A.close, () => {
+      check(isManager(this), "must be manager to close");
+      return [
+        (k) => {
+          k(null);
+          return [s];
         },
       ];
     });

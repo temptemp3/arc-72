@@ -5,3 +5,5 @@ package.json
 reach
 .env
 np.sh
+node_modules
+teal

@@ -1,15 +1,36 @@
 import { loadStdlib, test } from "@reach-sh/stdlib";
 import * as backend from "./build/index.main.mjs";
 
+// import CONTRACT from "arccjs";
+// import template from "./template.json" assert { type: "json" };
+// import fs from "fs";
+// import { generateABI } from "ctc2abi";
+
 const stdlib = loadStdlib(process.env);
+
+const zeroAddress =
+  "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAY5HFKQ";
+
+const accZero = await stdlib.connectAccount({ addr: zeroAddress });
+
+const ctcZero = accZero.contract(backend);
+
+//
+// generates ABI from template.json
+//
+// const schema = await generateABI(ctcZero);
+//
+// try {
+//   fs.writeFileSync("contract.json", JSON.stringify(schema));
+// } catch (err) {
+//   console.error(err);
+// }
+
 const fa = stdlib.formatAddress;
 const bn2n = stdlib.bigNumberToNumber;
 const bn = stdlib.bigNumberify;
 
 const fromSome = (v, d) => (v[0] === "None" ? d : v[1]);
-
-const zeroAddress =
-  "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAY5HFKQ";
 
 const assertFail = async (promise, errStr) => {
   try {
@@ -66,7 +87,7 @@ const deployAs = async (acc) => {
 
 const initBal = stdlib.parseCurrency(1000);
 const accs = await stdlib.newTestAccounts(4, initBal);
-//accs.forEach(acc => acc.setGasLimit(5000000));
+
 const [acc0, acc1, acc2, acc3] = accs;
 const [addr0, addr1, addr2, addr3] = accs.map((a) => a.networkAccount.addr);
 
@@ -74,7 +95,12 @@ console.log({ addr0, addr1, addr2, addr3 });
 
 const ctcInfo = await deployAs(acc0);
 
-const accZero = await stdlib.connectAccount({ addr: zeroAddress });
+console.log("ABI:");
+console.log(await ctcZero.getABI());
+
+console.log("CtcInfo:", bn2n(ctcInfo));
+
+///--- main
 
 const {
   v: {
@@ -85,7 +111,9 @@ const {
     arc72_tokenURI,
   },
   e: { arc72_Transfer },
-} = accZero.contract(backend, ctcInfo);
+} = ctcZero;
+
+// monitor events
 arc72_Transfer.monitor(console.log);
 
 const displayAddressIndex = async (addr, idx) => {
@@ -119,6 +147,7 @@ const displayAddressIndex = async (addr, idx) => {
 // ---------------------------------------------
 // ownerOf(1) = zeroAddress
 // ---------------------------------------------
+
 test.chk(
   "ownerOf(1) = zeroAddress",
   fa(fromSome(await arc72_ownerOf(1))),
@@ -152,8 +181,6 @@ test.chk("ownerOf(1) = addr1", fa(fromSome(await arc72_ownerOf(1))), addr1);
 await displayAddressIndex(addr1, 1);
 
 await stdlib.wait(20);
-
-process.exit(0);
 
 const ctc = (acc) => acc.contract(backend, ctcinfo);
 const [ctc1, ctc2, ctc3] = [acc1, acc2, acc3].map((a) => ctc(a));
@@ -341,4 +368,4 @@ const main = async () => {
   await TestARC72();
 };
 
-main();
+await main();
