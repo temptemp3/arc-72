@@ -13,6 +13,7 @@ Algorand Smart Contract NFT (ARC-72)
 
 CHANGELOG
 
+24.01.04 - complete mod, add arc72d implementation  
 23.11.18 - v0.2.0 refacor, remove maybe address type
 23.03.08 - (wip) major refactor, add missing method stubs  
 23.03.07 - (wip) refactor, remove zero address  
