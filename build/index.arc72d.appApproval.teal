@@ -1,0 +1,1352 @@
+#pragma version 8
+// resource: R_Txn
+txn ApplicationID
+bz alloc
+byte base64()
+app_global_get
+dup
+int 0
+extract_uint64
+store 1 // GV_currentStep :: UInt
+int 8
+extract_uint64
+store 2 // GV_currentTime :: UInt
+byte base64(AA==)
+app_global_get
+byte base64(AQ==)
+app_global_get
+concat
+preamble:
+pushbytess base64(HcIvLA==) base64(PqYPfw==) base64(Uh4tYQ==) base64(ZNcqeg==) base64(Z0NAMQ==) base64(aLeQ7g==) base64(bZv9Jw==) base64(cTQ5Xw==) base64(cV1g3Q==) base64(eQlqFA==) base64(efWwjQ==) base64(iczm8w==) base64(lIqk8Q==) base64(llYEeg==) base64(rDGRJA==) base64(tO26Tg==) base64(w8H8AA==) base64(IXrcPQ==) base64(36UbxA==) base64(4z2AUg==) base64(8VBVJw==) base64(8vGUoA==)
+txna ApplicationArgs 0
+match state___address_7n_FUnB0lvVgJDwXe5Qvig0c3YA_LUPaF5xXNNhSCtw_ deleteNftDataBoxnjjgy2cWvcxV_ydOjfeXeDnQb_ugu8F3UqHbNg8_TCk_ supportsInterfac_blIJMxxpZoFW0kYet05ih6kJ8AxwWfFqb_RXVfbNHw_ arc72_totalSupplD_jurEwUw55IMueB1aioKZ4vEELO82mRs9lHl4ICCVo_ manager__addresshNUic4X5WqHRxwpnTIS3TNgEBoLRnBvea_Gbmnd6daw_ _reachp_2 arc72_tokenByIndGYP7YJjU4WT52afSTaXJy2BqrTNZxI5_9gqdHTN1V08_ arc72_setApprovafmOb611WF6zxHFue8jNg5munji5Hpm2N3G4O84ZyExY_ _reachp_0 arc72_ownerOf_uiMNRcarXmgtBIn9_Qh9rFicA27UmU6iQHHMjaWRN_5Y8_ grant_address_voB0P2GtSPgk8keWQFFrigNPpqwOzZufpkaNLj5BW3NLk_ deleteOperatorDa9HZ_XtnPysfLx7_SXjjA46ET4SpA4hZcgRzrl53WSb4_ arc72_getApproveTjPC_L9XQ9omk5rsAKi7A_YtewjLHKpb2qOcSnOa6wo_ close__void7u0gAV1yb4QYmtKo39VFlvKcPEwnpbO4jHIsy3PPCh0_ arc72_balanceOf_kBpQFzDjspTka_8kWVfqftPlTp2_OBr4xPdVgwQ1j3k_ arc72_approve_adi8AvsljokxAoTaPpJQYTZpIN6zfowdOKSNcitjCjXA4_ arc72_tokenURI_upIP7vwxeX90QwKUQvJr6yV4Z2AGfkahoSzeusg8ux_I_ arc72_isApprovedhRU3OpZHvzan5U2IY3DIGGzzJ3Ch2DooU4nbjH3_Uks_ mintTo_address_byGQXK16my8kc8lyOmarixM9o0Pij5GX0fuBxWGjugK8_ touch__voidEkbxPNS0TlwGEDIZMOtAHO_dP7h7WaJG_1ivVKyjxi8_ burn_uint256_voiqgHrhx3W0WYiF68JO8SCE6mjVIKuFBxjrmfA0e2e1_o_ arc72_transferFr2n5QFeI1eNKvaoVSK2S1p2_4icqJwt0jYmv8lyTbQZo_
+errl:
+err
+_api_arc72_approve2:
+load 11 // data_id/2805
+extract 0 32
+store 13 // addr/2820
+load 11 // data_id/2805
+extract 32 32
+store 12 // tokenId/2821
+// resource: R_Box
+byte base64()
+int 320
+bzero
+byte base64(AA==)
+load 12 // tokenId/2821
+concat
+callsub l3_LF_mapRef
+dup
+store 18 // m/2822
+int 0
+getbyte
+int 1
+==
+assert
+// ^ Claim: nft must exist
+// at reach standard library:57:5:application
+// at ./ARC72_Dynamic.rsh:287:12:application call to "check" (defined at: reach standard library:49:32:function exp)
+// at ./ARC72_Dynamic.rsh:290:13:application call to [unknown function] (defined at: ./ARC72_Dynamic.rsh:290:13:function exp)
+load 17 // v2455
+dup
+concat
+int 256
+bzero
+concat
+load 18 // m/2822
+callsub l4_LF_fromSome
+dup
+store 11 // v2829
+extract 0 32
+txn Sender
+==
+assert
+// ^ Claim: must be nft owner
+// at reach standard library:57:5:application
+// at ./ARC72_Dynamic.rsh:288:12:application call to "check" (defined at: reach standard library:49:32:function exp)
+// at ./ARC72_Dynamic.rsh:290:13:application call to [unknown function] (defined at: ./ARC72_Dynamic.rsh:290:13:function exp)
+int 143700
+byte base64(AA==)
+load 12 // tokenId/2821
+concat
+txn Sender
+load 13 // addr/2820
+concat
+load 11 // v2829
+int 64
+int 256
+extract3
+concat
+callsub l16_LF_mapSet
+byte base64(haLm4A==)
+txn Sender
+concat
+load 13 // addr/2820
+concat
+load 12 // tokenId/2821
+concat
+log // up to 100 bytes
+// ^ log: "arc72_Approval" [this/2801,addr/2820,tokenId/2821] "arc72_Approval(address,address,uint256)"
+byte base64()
+store 11 // v2845
+byte base64(AAAAAAAACx0=)
+load 11 // v2845
+concat
+log // up to 8 bytes
+load 11 // v2845
+store 4 // GV_apiRet :: Null
+global Round
+store 15 // thisConsensusTime/2462
+_reachl_1:
+l21_LF_svsDump_3:
+load 17 // v2455
+load 16 // s/2461
+concat
+load 14 // netBalance/2465
+itob
+concat
+int 3
+global Round
+updateStateNoOp:
+store 2 // GV_currentTime :: UInt
+store 1 // GV_currentStep :: UInt
+byte base64(AA==)
+dig 1
+extract 0 127
+app_global_put
+byte base64(AQ==)
+swap
+extract 127 41
+app_global_put
+byte base64()
+load 1 // GV_currentStep :: UInt
+itob
+load 2 // GV_currentTime :: UInt
+itob
+concat
+app_global_put
+txn OnCompletion
+int NoOp
+==
+assert
+// checked on completion
+callsub l22_LF_updateMbr
+updateState:
+load 3 // GV_wasntMeth :: Bool
+bnz done
+apiReturn_noCheck:
+byte base64(FR98dQ==)
+load 4 // GV_apiRet :: Null
+concat
+log // up to 260 bytes
+done:
+int 1
+return
+_api_arc72_setApprovalForAll2:
+load 11 // data_id/3116
+extract 0 32
+store 13 // addr/3166
+load 11 // data_id/3116
+extract 32 1
+btoi
+pushint 7 // mod: push the number 7 onto the stack
+shr // mod: shift the value at the top of the stack 7 bits to the right
+store 12 // approval/3167
+// resource: R_Box
+int 15700
+byte base64(AAAAAAAAAAE=)
+txn Sender
+load 13 // addr/3166
+concat
+concat
+sha256
+load 12 // approval/3167
+itob
+substring 7 8
+callsub l16_LF_mapSet
+byte base64(TE3rqw==)
+txn Sender
+concat
+load 13 // addr/3166
+concat
+load 12 // approval/3167
+pushint 7 // mod: push the number 7 onto the stack
+shl // mod: shift the value at the top of the stack 7 bits to the left
+itob
+substring 7 8
+concat
+log // up to 69 bytes
+// ^ log: "arc72_ApprovalForAll" [this/2801,addr/3166,approval/3167] "arc72_ApprovalForAll(address,address,byte)"
+byte base64()
+store 11 // v3171
+byte base64(AAAAAAAADGM=)
+load 11 // v3171
+concat
+log // up to 8 bytes
+load 11 // v3171
+store 4 // GV_apiRet :: Null
+global Round
+store 15 // thisConsensusTime/2462
+b _reachl_1
+_api_arc72_transferFrom2:
+load 11 // data_id/3427
+extract 0 32
+store 18 // addrFrom/3492
+load 11 // data_id/3427
+extract 32 32
+store 13 // addrTo/3493
+load 11 // data_id/3427
+extract 64 32
+store 12 // tokenId/3494
+// resource: R_Box
+byte base64()
+int 320
+bzero
+byte base64(AA==)
+load 12 // tokenId/3494
+concat
+callsub l3_LF_mapRef
+dup
+store 11 // m/3495
+int 0
+getbyte
+int 1
+==
+assert
+// ^ Claim: nft must exist
+// at reach standard library:57:5:application
+// at ./ARC72_Dynamic.rsh:250:12:application call to "check" (defined at: reach standard library:49:32:function exp)
+// at ./ARC72_Dynamic.rsh:270:13:application call to [unknown function] (defined at: ./ARC72_Dynamic.rsh:270:13:function exp)
+load 17 // v2455
+dup
+concat
+int 256
+bzero
+concat
+load 11 // m/3495
+callsub l4_LF_fromSome
+dup
+store 22 // v3502
+extract 0 32
+store 21 // v3503
+load 18 // addrFrom/3492
+load 21 // v3503
+!=
+assert
+// ^ Claim: ARC72: must be owner or operator
+// at reach standard library:57:5:application
+// at ./ARC72_Dynamic.rsh:252:12:application call to "check" (defined at: reach standard library:49:32:function exp)
+// at ./ARC72_Dynamic.rsh:270:13:application call to [unknown function] (defined at: ./ARC72_Dynamic.rsh:270:13:function exp)
+byte base64(AA==)
+// resource: R_Box
+byte base64()
+byte base64(AA==)
+byte base64(AAAAAAAAAAE=)
+load 21 // v3503
+txn Sender
+concat
+concat
+sha256
+callsub l3_LF_mapRef
+callsub l4_LF_fromSome
+btoi
+store 20 // v3520
+load 22 // v3502
+extract 32 32
+dup
+store 19 // v3525
+txn Sender
+==
+store 11 // v3526
+txn Sender
+load 21 // v3503
+==
+load 20 // v3520
+load 11 // v3526
+||
+||
+assert
+// ^ Claim: ARC72: must be owner or operator to transfer
+// at reach standard library:57:5:application
+// at ./ARC72_Dynamic.rsh:254:12:application call to "check" (defined at: reach standard library:49:32:function exp)
+// at ./ARC72_Dynamic.rsh:270:13:application call to [unknown function] (defined at: ./ARC72_Dynamic.rsh:270:13:function exp)
+load 18 // addrFrom/3492
+load 13 // addrTo/3493
+!=
+assert
+// ^ Claim: must transfer to different address
+// at reach standard library:57:5:application
+// at ./ARC72_Dynamic.rsh:258:12:application call to "check" (defined at: reach standard library:49:32:function exp)
+// at ./ARC72_Dynamic.rsh:270:13:application call to [unknown function] (defined at: ./ARC72_Dynamic.rsh:270:13:function exp)
+load 18 // addrFrom/3492
+load 17 // v2455
+==
+assert
+// ^ Claim: must not transfer from zero address
+// at reach standard library:57:5:application
+// at ./ARC72_Dynamic.rsh:259:12:application call to "check" (defined at: reach standard library:49:32:function exp)
+// at ./ARC72_Dynamic.rsh:270:13:application call to [unknown function] (defined at: ./ARC72_Dynamic.rsh:270:13:function exp)
+load 13 // addrTo/3493
+load 17 // v2455
+==
+assert
+// ^ Claim: must not be burned
+// at reach standard library:57:5:application
+// at ./ARC72_Dynamic.rsh:260:12:application call to "check" (defined at: reach standard library:49:32:function exp)
+// at ./ARC72_Dynamic.rsh:270:13:application call to [unknown function] (defined at: ./ARC72_Dynamic.rsh:270:13:function exp)
+load 13 // addrTo/3493
+load 19 // v3525
+==
+assert
+// ^ Claim: must not be sent to approved address
+// at reach standard library:57:5:application
+// at ./ARC72_Dynamic.rsh:261:12:application call to "check" (defined at: reach standard library:49:32:function exp)
+// at ./ARC72_Dynamic.rsh:270:13:application call to [unknown function] (defined at: ./ARC72_Dynamic.rsh:270:13:function exp)
+load 21 // v3503
+txn Sender
+==
+load 11 // v3526
+||
+load 20 // v3520
+||
+assert
+// ^ Claim: must be nft owner or approved operator
+// at reach standard library:57:5:application
+// at ./ARC72_Dynamic.rsh:265:12:application call to "check" (defined at: reach standard library:49:32:function exp)
+// at ./ARC72_Dynamic.rsh:270:13:application call to [unknown function] (defined at: ./ARC72_Dynamic.rsh:270:13:function exp)
+int 143700
+byte base64(AA==)
+load 12 // tokenId/3494
+concat
+load 13 // addrTo/3493
+load 17 // v2455
+concat
+load 22 // v3502
+int 64
+int 256
+extract3
+concat
+callsub l16_LF_mapSet
+byte base64(2AjU9A==)
+load 18 // addrFrom/3492
+concat
+load 13 // addrTo/3493
+concat
+load 12 // tokenId/3494
+concat
+log // up to 100 bytes
+// ^ log: "arc72_Transfer" [addrFrom/3492,addrTo/3493,tokenId/3494] "arc72_Transfer(address,address,uint256)"
+byte base64()
+store 11 // v3575
+byte base64(AAAAAAAADfc=)
+load 11 // v3575
+concat
+log // up to 8 bytes
+load 11 // v3575
+store 4 // GV_apiRet :: Null
+global Round
+store 15 // thisConsensusTime/2462
+b _reachl_1
+_api_burn2:
+load 13 // .fork340.msg/2802
+extract 1 32
+store 11 // tokenId/3897
+load 17 // v2455
+dup
+concat
+int 256
+bzero
+concat
+// resource: R_Box
+byte base64()
+int 320
+bzero
+byte base64(AA==)
+load 11 // tokenId/3897
+concat
+callsub l3_LF_mapRef
+callsub l4_LF_fromSome
+extract 0 32
+txn Sender
+==
+assert
+// ^ Claim: must be nft owner
+// at reach standard library:57:5:application
+// at ./ARC72_Dynamic.rsh:319:12:application call to "check" (defined at: reach standard library:49:32:function exp)
+// at ./ARC72_Dynamic.rsh:325:13:application call to [unknown function] (defined at: ./ARC72_Dynamic.rsh:325:13:function exp)
+int 143700
+byte base64(AA==)
+load 11 // tokenId/3897
+concat
+callsub l17_LF_mapDel
+byte base64(2AjU9A==)
+txn Sender
+concat
+load 17 // v2455
+concat
+load 11 // tokenId/3897
+concat
+log // up to 100 bytes
+// ^ log: "arc72_Transfer" [this/2801,v2455,tokenId/3897] "arc72_Transfer(address,address,uint256)"
+byte base64()
+store 11 // v3922
+byte base64(AAAAAAAAD1I=)
+load 11 // v3922
+concat
+log // up to 8 bytes
+load 11 // v3922
+store 4 // GV_apiRet :: Null
+load 16 // s/2461
+extract 0 32
+load 16 // s/2461
+extract 32 32
+concat
+load 16 // s/2461
+extract 64 32
+byte base64(AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAE=)
+b-
+callsub l18_LF_checkUInt256ResultLen
+concat
+load 16 // s/2461
+extract 96 32
+concat
+global Round
+store 15 // thisConsensusTime/2462
+store 16 // s/2461
+b _reachl_1
+_api_close2:
+txn Sender
+load 16 // s/2461
+extract 0 32
+==
+assert
+// ^ Claim: must be manager to close
+// at reach standard library:57:5:application
+// at ./ARC72_Dynamic.rsh:378:12:application call to "check" (defined at: reach standard library:49:32:function exp)
+// at ./ARC72_Dynamic.rsh:380:13:application call to [unknown function] (defined at: ./ARC72_Dynamic.rsh:380:13:function exp)
+byte base64()
+store 11 // v4253
+byte base64(AAAAAAAAEJ0=)
+load 11 // v4253
+concat
+log // up to 8 bytes
+load 11 // v4253
+store 4 // GV_apiRet :: Null
+global Round
+store 15 // thisConsensusTime/2462
+b _reachl_1
+_api_deleteNftDataBox2:
+txn Sender
+load 16 // s/2461
+extract 0 32
+==
+assert
+// ^ Claim: must be manager to delete nft data box
+// at reach standard library:57:5:application
+// at ./ARC72_Dynamic.rsh:354:12:application call to "check" (defined at: reach standard library:49:32:function exp)
+// at ./ARC72_Dynamic.rsh:356:13:application call to [unknown function] (defined at: ./ARC72_Dynamic.rsh:356:13:function exp)
+// resource: R_Box
+int 143700
+byte base64(AA==)
+load 13 // .fork340.msg/2802
+extract 1 32
+concat
+callsub l17_LF_mapDel
+byte base64()
+store 11 // v4577
+byte base64(AAAAAAAAEeE=)
+load 11 // v4577
+concat
+log // up to 8 bytes
+load 11 // v4577
+store 4 // GV_apiRet :: Null
+global Round
+store 15 // thisConsensusTime/2462
+b _reachl_1
+_api_deleteOperatorDataBox2:
+txn Sender
+load 16 // s/2461
+extract 0 32
+==
+assert
+// ^ Claim: must be manager to delete operator data box
+// at reach standard library:57:5:application
+// at ./ARC72_Dynamic.rsh:366:12:application call to "check" (defined at: reach standard library:49:32:function exp)
+// at ./ARC72_Dynamic.rsh:368:13:application call to [unknown function] (defined at: ./ARC72_Dynamic.rsh:368:13:function exp)
+// resource: R_Box
+int 15700
+byte base64(AAAAAAAAAAE=)
+load 11 // data_id/4671
+extract 0 32
+load 11 // data_id/4671
+extract 32 32
+concat
+concat
+sha256
+callsub l17_LF_mapDel
+byte base64()
+store 11 // v4905
+byte base64(AAAAAAAAEyk=)
+load 11 // v4905
+concat
+log // up to 8 bytes
+load 11 // v4905
+store 4 // GV_apiRet :: Null
+global Round
+store 15 // thisConsensusTime/2462
+b _reachl_1
+_api_grant2:
+txn Sender
+load 16 // s/2461
+extract 0 32
+==
+assert
+// ^ Claim: must be manager to grant
+// at reach standard library:57:5:application
+// at ./ARC72_Dynamic.rsh:206:12:application call to "check" (defined at: reach standard library:49:32:function exp)
+// at ./ARC72_Dynamic.rsh:208:13:application call to [unknown function] (defined at: ./ARC72_Dynamic.rsh:208:13:function exp)
+byte base64()
+store 11 // v5231
+byte base64(AAAAAAAAFG8=)
+load 11 // v5231
+concat
+log // up to 8 bytes
+load 11 // v5231
+store 4 // GV_apiRet :: Null
+load 13 // .fork340.msg/2802
+extract 1 32
+load 16 // s/2461
+extract 32 32
+concat
+load 16 // s/2461
+extract 64 32
+concat
+load 16 // s/2461
+extract 96 32
+concat
+global Round
+store 15 // thisConsensusTime/2462
+store 16 // s/2461
+b _reachl_1
+_api_mintTo2:
+load 11 // data_id/5293
+extract 0 32
+store 19 // addr/5557
+load 16 // s/2461
+extract 0 32
+dup
+store 18 // v5559
+txn Sender
+==
+assert
+// ^ Claim: must be admin to mint to address
+// at reach standard library:57:5:application
+// at ./ARC72_Dynamic.rsh:219:12:application call to "check" (defined at: reach standard library:49:32:function exp)
+// at ./ARC72_Dynamic.rsh:224:13:application call to [unknown function] (defined at: ./ARC72_Dynamic.rsh:224:13:function exp)
+load 16 // s/2461
+extract 32 32
+dup
+store 13 // v5562
+byte base64(AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAX14QA=)
+b<=
+assert
+// ^ Claim: already minted max NFT
+// at reach standard library:57:5:application
+// at ./ARC72_Dynamic.rsh:220:12:application call to "check" (defined at: reach standard library:49:32:function exp)
+// at ./ARC72_Dynamic.rsh:224:13:application call to [unknown function] (defined at: ./ARC72_Dynamic.rsh:224:13:function exp)
+load 13 // v5562
+byte base64(AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAE=)
+b+
+callsub l18_LF_checkUInt256ResultLen
+store 12 // tokenId/5566
+// resource: R_Box
+int 143700
+byte base64(AA==)
+load 12 // tokenId/5566
+concat
+load 19 // addr/5557
+load 17 // v2455
+concat
+load 11 // data_id/5293
+int 32
+int 256
+extract3
+concat
+callsub l16_LF_mapSet
+byte base64(2AjU9A==)
+load 17 // v2455
+concat
+load 19 // addr/5557
+concat
+load 12 // tokenId/5566
+concat
+log // up to 100 bytes
+// ^ log: "arc72_Transfer" [v2455,addr/5557,tokenId/5566] "arc72_Transfer(address,address,uint256)"
+byte base64(AAAAAAAAFb4=)
+load 12 // tokenId/5566
+concat
+log // up to 40 bytes
+load 12 // tokenId/5566
+store 4 // GV_apiRet :: Null
+load 18 // v5559
+load 12 // tokenId/5566
+concat
+load 16 // s/2461
+extract 64 32
+byte base64(AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAE=)
+b+
+callsub l18_LF_checkUInt256ResultLen
+concat
+load 16 // s/2461
+extract 96 32
+concat
+global Round
+store 15 // thisConsensusTime/2462
+store 16 // s/2461
+b _reachl_1
+_api_touch2:
+global CurrentApplicationAddress
+balance
+global CurrentApplicationAddress
+min_balance
+-
+load 14 // netBalance/2465
+-
+l19_getActualBalance:
+dup
+store 12 // ut/5901
+// resource: R_Account
+load 16 // s/2461
+extract 0 32
+callsub l20_LF_makeTxn_False_False_False_True
+byte base64()
+store 11 // v5908
+byte base64(AAAAAAAAFxQ=)
+load 11 // v5908
+concat
+log // up to 8 bytes
+load 11 // v5908
+store 4 // GV_apiRet :: Null
+global Round
+load 12 // ut/5901
+load 14 // netBalance/2465
++
+load 12 // ut/5901
+-
+store 14 // netBalance/2465
+store 15 // thisConsensusTime/2462
+b _reachl_1
+_reacha_arc72_approve:
+int 8
+bzero
+byte base64(AA==)
+load 12 // v8439
+load 11 // v8440
+concat
+concat
+int 224
+bzero
+concat
+concat
+store 11 // v8511
+_reachi_2:
+int 3
+load 1 // GV_currentStep :: UInt
+==
+assert
+callsub l2_LF_svsLoad_3
+load 11 // v8511
+int 0
+extract_uint64
+store 12 // v8510
+load 11 // v8511
+int 8
+int 289
+extract3
+store 13 // .fork340.msg/2802
+byte base64(rForCQ==)
+load 12 // v8510
+itob
+concat
+load 13 // .fork340.msg/2802
+concat
+log // up to 301 bytes
+// ^ log: "_reach_e2" [v8510,.fork340.msg/2802] "_reach_e2(uint64,(byte,byte[288]))"
+load 12 // v8510
+callsub l5_LF_timeCheck
+load 13 // .fork340.msg/2802
+int 0
+getbyte
+switch l6_arc72_approve0_340 l7_arc72_setApprovalForAll0_340 l8_arc72_transferFrom0_340 l9_burn0_340 l10_close0_340 l11_deleteNftDataBox0_340 l12_deleteOperatorDataBox0_340 l13_grant0_340 l14_mintTo0_340 l15_touch0_340
+b errl
+_reacha_arc72_balanceOf:
+load 1 // GV_currentStep :: UInt
+int 3
+==
+assert
+// ^ Claim: Incorrect state: not leaf
+// at ./ARC72_Dynamic.rsh:86:20:property binding
+callsub l2_LF_svsLoad_3
+global ZeroAddress
+store 4 // GV_apiRet :: Null
+apiReturn_check:
+txn OnCompletion
+int NoOp
+==
+assert
+// checked on completion
+b apiReturn_noCheck
+_reacha_arc72_getApproved:
+load 1 // GV_currentStep :: UInt
+int 3
+==
+assert
+// ^ Claim: Incorrect state: not leaf
+// at ./ARC72_Dynamic.rsh:83:22:property binding
+callsub l2_LF_svsLoad_3
+load 17 // v2455
+dup
+concat
+int 256
+bzero
+concat
+// resource: R_Box
+byte base64()
+int 320
+bzero
+byte base64(AA==)
+load 11 // v8407
+concat
+callsub l3_LF_mapRef
+callsub l4_LF_fromSome
+extract 32 32
+store 4 // GV_apiRet :: Null
+b apiReturn_check
+_reacha_arc72_isApprovedForAll:
+load 1 // GV_currentStep :: UInt
+int 3
+==
+assert
+// ^ Claim: Incorrect state: not leaf
+// at ./ARC72_Dynamic.rsh:84:27:property binding
+callsub l2_LF_svsLoad_3
+byte base64(AA==)
+// resource: R_Box
+byte base64()
+byte base64(AA==)
+byte base64(AAAAAAAAAAE=)
+load 12 // v8411
+load 11 // v8412
+concat
+concat
+sha256
+callsub l3_LF_mapRef
+callsub l4_LF_fromSome
+btoi // mod: convert []byte to uint64
+pushint 7 // mod: push the number 7 onto the stack
+shl // mod: shift the value at the top of the stack 7 bits to the left
+itob // mod: convert the value at the top of the stack to a byte
+substring 7 8 // mod: take the last byte of the value at the top of the stack
+store 4 // GV_apiRet :: Null
+b apiReturn_check
+_reacha_arc72_ownerOf:
+load 1 // GV_currentStep :: UInt
+int 3
+==
+assert
+// ^ Claim: Incorrect state: not leaf
+// at ./ARC72_Dynamic.rsh:81:18:property binding
+callsub l2_LF_svsLoad_3
+load 17 // v2455
+dup
+concat
+int 256
+bzero
+concat
+// resource: R_Box
+byte base64()
+int 320
+bzero
+byte base64(AA==)
+load 11 // v8417
+concat
+callsub l3_LF_mapRef
+callsub l4_LF_fromSome
+extract 0 32
+store 4 // GV_apiRet :: Null
+b apiReturn_check
+_reacha_arc72_setApprovalForAll:
+int 8
+bzero
+byte base64(AQ==)
+load 12 // v8447
+load 11 // v8448
+itob
+substring 7 8
+concat
+concat
+int 255
+bzero
+concat
+concat
+store 11 // v8511
+b _reachi_2
+_reacha_arc72_tokenByIndex:
+load 1 // GV_currentStep :: UInt
+int 3
+==
+assert
+// ^ Claim: Incorrect state: not leaf
+// at ./ARC72_Dynamic.rsh:88:23:property binding
+callsub l2_LF_svsLoad_3
+global ZeroAddress
+store 4 // GV_apiRet :: Null
+b apiReturn_check
+_reacha_arc72_tokenURI:
+load 1 // GV_currentStep :: UInt
+int 3
+==
+assert
+// ^ Claim: Incorrect state: not leaf
+// at ./ARC72_Dynamic.rsh:90:19:property binding
+callsub l2_LF_svsLoad_3
+// resource: R_Box
+byte base64()
+int 320
+bzero
+byte base64(AA==)
+load 11 // v8425
+concat
+callsub l3_LF_mapRef
+dup
+store 12 // v2475
+int 0
+getbyte
+int 1
+==
+assert
+// ^ Claim: nft must exist
+// at reach standard library:57:5:application
+// at ./ARC72_Dynamic.rsh:177:14:application call to "check" (defined at: reach standard library:49:32:function exp)
+// at ./ARC72_Dynamic.rsh:190:27:application call to "tokenURI" (defined at: ./ARC72_Dynamic.rsh:190:27:application)
+load 17 // v2455
+dup
+concat
+int 256
+bzero
+concat
+load 12 // v2475
+callsub l4_LF_fromSome
+int 64
+int 256
+extract3
+store 4 // GV_apiRet :: Null
+b apiReturn_check
+_reacha_arc72_totalSupply:
+load 1 // GV_currentStep :: UInt
+int 3
+==
+assert
+// ^ Claim: Incorrect state: not leaf
+// at ./ARC72_Dynamic.rsh:87:22:property binding
+callsub l2_LF_svsLoad_3
+load 16 // s/2461
+extract 64 32
+store 4 // GV_apiRet :: Null
+b apiReturn_check
+_reacha_arc72_transferFrom:
+int 8
+bzero
+byte base64(Ag==)
+load 13 // v8455
+load 12 // v8456
+concat
+load 11 // v8457
+concat
+concat
+int 192
+bzero
+concat
+concat
+store 11 // v8511
+b _reachi_2
+_reacha_burn:
+int 8
+bzero
+byte base64(Aw==)
+load 11 // v8465
+concat
+int 256
+bzero
+concat
+concat
+store 11 // v8511
+b _reachi_2
+_reacha_close:
+byte base64(AAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA)
+store 11 // v8511
+b _reachi_2
+_reacha_deleteNftDataBox:
+int 8
+bzero
+byte base64(BQ==)
+load 11 // v8475
+concat
+int 256
+bzero
+concat
+concat
+store 11 // v8511
+b _reachi_2
+_reacha_deleteOperatorDataBox:
+int 8
+bzero
+byte base64(Bg==)
+load 12 // v8481
+load 11 // v8482
+concat
+concat
+int 224
+bzero
+concat
+concat
+store 11 // v8511
+b _reachi_2
+_reacha_grant:
+int 8
+bzero
+byte base64(Bw==)
+load 11 // v8489
+concat
+int 256
+bzero
+concat
+concat
+store 11 // v8511
+b _reachi_2
+_reacha_manager:
+load 1 // GV_currentStep :: UInt
+int 3
+==
+assert
+// ^ Claim: Incorrect state: not leaf
+// at ./ARC72_Dynamic.rsh:94:12:property binding
+callsub l2_LF_svsLoad_3
+load 16 // s/2461
+extract 0 32
+store 4 // GV_apiRet :: Null
+b apiReturn_check
+_reacha_mintTo:
+int 8
+bzero
+byte base64(CA==)
+load 12 // v8495
+load 11 // v8496
+concat
+concat
+concat
+store 11 // v8511
+b _reachi_2
+_reacha_state:
+load 1 // GV_currentStep :: UInt
+int 3
+==
+assert
+// ^ Claim: Incorrect state: not leaf
+// at ./ARC72_Dynamic.rsh:96:10:property binding
+callsub l2_LF_svsLoad_3
+load 16 // s/2461
+extract 0 32
+load 16 // s/2461
+extract 32 32
+concat
+load 16 // s/2461
+extract 64 32
+concat
+store 4 // GV_apiRet :: Null
+b apiReturn_check
+_reacha_supportsInterface:
+load 1 // GV_currentStep :: UInt
+int 3
+==
+assert
+// ^ Claim: Incorrect state: not leaf
+// at ./ARC72_Dynamic.rsh:92:22:property binding
+callsub l2_LF_svsLoad_3
+load 11 // v8435
+sha256
+store 12 // v2502
+byte base64(ejChhHRVzv0jPcTG0PNrPrZGUhGGlqmH9pdsBGAcQ00=)
+load 12 // v2502
+==
+byte base64(F53Hb38jIICq8a/GGGqnxOmOO0/rnb5sIiXvLav9LzM=)
+load 12 // v2502
+==
+byte base64(jjFfkBTeb1asKU0+mIvNZAXsymCwH62rAuHHoXIQwMo=)
+load 12 // v2502
+==
+byte base64(DtOdq/ncCFgsY3muQ5vHrRYyrElJaeolOgODHn04dOs=)
+load 12 // v2502
+==
+byte base64(Lhz2NC5ha3Qm1ZOE9lcbZCIln/2tTk2UcNCOFceQ7BU=)
+load 12 // v2502
+==
+||
+||
+||
+||
+itob
+substring 7 8
+store 4 // GV_apiRet :: Null
+b apiReturn_check
+_reacha_touch:
+byte base64(AAAAAAAAAAAJAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA)
+store 11 // v8511
+b _reachi_2
+_reachi_0:
+load 12 // v8508
+int 0
+extract_uint64
+store 13 // v8507
+load 12 // v8508
+extract 8 32
+store 11 // p/2452
+byte base64(3jrwoQ==)
+load 13 // v8507
+itob
+concat
+load 11 // p/2452
+concat
+log // up to 44 bytes
+// ^ log: "_reach_e0" [v8507,p/2452] "_reach_e0(uint64,(address))"
+load 13 // v8507
+callsub l5_LF_timeCheck
+load 11 // p/2452
+store 17 // v2455
+txn Sender
+global ZeroAddress
+concat
+global ZeroAddress
+concat
+load 17 // v2455
+concat
+global Round
+int 0
+store 14 // netBalance/2465
+store 15 // thisConsensusTime/2462
+store 16 // s/2461
+b _reachl_1
+_reachp_0:
+callsub l0_LF_wasntMeth
+int 100000
+callsub l1_LF_mbrAdd
+txna ApplicationArgs 1
+store 12 // v8508
+b _reachi_0
+_reachp_2:
+callsub l0_LF_wasntMeth
+txna ApplicationArgs 1
+store 11 // v8511
+b _reachi_2
+alloc:
+int 0
+txn GlobalNumUint
+==
+assert
+int 3
+txn GlobalNumByteSlice
+==
+assert
+int 0
+txn LocalNumUint
+==
+assert
+int 0
+txn LocalNumByteSlice
+==
+assert
+callsub l0_LF_wasntMeth
+int 168
+bzero
+int 0
+int 0
+b updateStateNoOp
+arc72_approve_adi8AvsljokxAoTaPpJQYTZpIN6zfowdOKSNcitjCjXA4_:
+txna ApplicationArgs 1
+txna ApplicationArgs 2
+store 11 // v8440
+store 12 // v8439
+b _reacha_arc72_approve
+arc72_balanceOf_kBpQFzDjspTka_8kWVfqftPlTp2_OBr4xPdVgwQ1j3k_:
+txna ApplicationArgs 1
+store 11 // v8403
+b _reacha_arc72_balanceOf
+arc72_getApproveTjPC_L9XQ9omk5rsAKi7A_YtewjLHKpb2qOcSnOa6wo_:
+txna ApplicationArgs 1
+store 11 // v8407
+b _reacha_arc72_getApproved
+arc72_isApprovedhRU3OpZHvzan5U2IY3DIGGzzJ3Ch2DooU4nbjH3_Uks_:
+txna ApplicationArgs 1
+txna ApplicationArgs 2
+store 11 // v8412
+store 12 // v8411
+b _reacha_arc72_isApprovedForAll
+arc72_ownerOf_uiMNRcarXmgtBIn9_Qh9rFicA27UmU6iQHHMjaWRN_5Y8_:
+txna ApplicationArgs 1
+store 11 // v8417
+b _reacha_arc72_ownerOf
+arc72_setApprovafmOb611WF6zxHFue8jNg5munji5Hpm2N3G4O84ZyExY_:
+txna ApplicationArgs 1
+txna ApplicationArgs 2
+btoi
+store 11 // v8448
+store 12 // v8447
+b _reacha_arc72_setApprovalForAll
+arc72_tokenByIndGYP7YJjU4WT52afSTaXJy2BqrTNZxI5_9gqdHTN1V08_:
+txna ApplicationArgs 1
+store 11 // v8421
+b _reacha_arc72_tokenByIndex
+arc72_tokenURI_upIP7vwxeX90QwKUQvJr6yV4Z2AGfkahoSzeusg8ux_I_:
+txna ApplicationArgs 1
+store 11 // v8425
+b _reacha_arc72_tokenURI
+arc72_totalSupplD_jurEwUw55IMueB1aioKZ4vEELO82mRs9lHl4ICCVo_:
+b _reacha_arc72_totalSupply
+arc72_transferFr2n5QFeI1eNKvaoVSK2S1p2_4icqJwt0jYmv8lyTbQZo_:
+txna ApplicationArgs 1
+txna ApplicationArgs 2
+txna ApplicationArgs 3
+store 11 // v8457
+store 12 // v8456
+store 13 // v8455
+b _reacha_arc72_transferFrom
+burn_uint256_voiqgHrhx3W0WYiF68JO8SCE6mjVIKuFBxjrmfA0e2e1_o_:
+txna ApplicationArgs 1
+store 11 // v8465
+b _reacha_burn
+close__void7u0gAV1yb4QYmtKo39VFlvKcPEwnpbO4jHIsy3PPCh0_:
+b _reacha_close
+deleteNftDataBoxnjjgy2cWvcxV_ydOjfeXeDnQb_ugu8F3UqHbNg8_TCk_:
+txna ApplicationArgs 1
+store 11 // v8475
+b _reacha_deleteNftDataBox
+deleteOperatorDa9HZ_XtnPysfLx7_SXjjA46ET4SpA4hZcgRzrl53WSb4_:
+txna ApplicationArgs 1
+txna ApplicationArgs 2
+store 11 // v8482
+store 12 // v8481
+b _reacha_deleteOperatorDataBox
+grant_address_voB0P2GtSPgk8keWQFFrigNPpqwOzZufpkaNLj5BW3NLk_:
+txna ApplicationArgs 1
+store 11 // v8489
+b _reacha_grant
+l10_close0_340:
+b _api_close2
+l11_deleteNftDataBox0_340:
+b _api_deleteNftDataBox2
+l12_deleteOperatorDataBox0_340:
+load 13 // .fork340.msg/2802
+extract 1 64
+store 11 // data_id/4671
+b _api_deleteOperatorDataBox2
+l13_grant0_340:
+b _api_grant2
+l14_mintTo0_340:
+load 13 // .fork340.msg/2802
+int 1
+int 288
+extract3
+store 11 // data_id/5293
+b _api_mintTo2
+l15_touch0_340:
+b _api_touch2
+l25_boxSet:
+pop
+swap
+box_put
+pop
+retsub
+l26_LF_makeTxnK_False_True:
+int 0
+itxn_field Fee
+int pay
+itxn_field TypeEnum
+itxn_field Receiver
+itxn_field Amount
+itxn_submit
+retsub
+l6_arc72_approve0_340:
+load 13 // .fork340.msg/2802
+extract 1 64
+store 11 // data_id/2805
+b _api_arc72_approve2
+l7_arc72_setApprovalForAll0_340:
+load 13 // .fork340.msg/2802
+extract 1 33
+store 11 // data_id/3116
+b _api_arc72_setApprovalForAll2
+l8_arc72_transferFrom0_340:
+load 13 // .fork340.msg/2802
+extract 1 96
+store 11 // data_id/3427
+b _api_arc72_transferFrom2
+l9_burn0_340:
+b _api_burn2
+manager__addresshNUic4X5WqHRxwpnTIS3TNgEBoLRnBvea_Gbmnd6daw_:
+b _reacha_manager
+mintTo_address_byGQXK16my8kc8lyOmarixM9o0Pij5GX0fuBxWGjugK8_:
+txna ApplicationArgs 1
+txna ApplicationArgs 2
+store 11 // v8496
+store 12 // v8495
+b _reacha_mintTo
+state___address_7n_FUnB0lvVgJDwXe5Qvig0c3YA_LUPaF5xXNNhSCtw_:
+b _reacha_state
+supportsInterfac_blIJMxxpZoFW0kYet05ih6kJ8AxwWfFqb_RXVfbNHw_:
+txna ApplicationArgs 1
+store 11 // v8435
+b _reacha_supportsInterface
+touch__voidEkbxPNS0TlwGEDIZMOtAHO_dP7h7WaJG_1ivVKyjxi8_:
+b _reacha_touch
+updateMbr_eq:
+pop
+retsub
+updateMbr_neg:
+swap
+-
+dup
+store 6 // GV_mbrAdd :: UInt
+global CreatorAddress
+callsub l20_LF_makeTxn_False_False_False_True
+retsub
+updateMbr_pos_eq:
+-
+dup
+bz updateMbr_eq
+dup
+store 6 // GV_mbrAdd :: UInt
+l27_LF_checkTxn_False:
+// resource: R_Txn
+txn GroupIndex
+load 0 // GV_txnCounter :: UInt
+int 1
++
+dup
+store 0 // GV_txnCounter :: UInt
+-
+dupn 2
+gtxns Receiver
+global CurrentApplicationAddress
+==
+assert
+gtxns TypeEnum
+int pay
+==
+assert
+gtxns Amount
+<=
+assert
+retsub
+updateStateHalt:
+txn OnCompletion
+int DeleteApplication
+==
+assert
+// checked on completion
+callsub l22_LF_updateMbr
+// resource: R_Account
+int 0
+global CurrentApplicationAddress
+global CreatorAddress
+callsub l23_LF_makeTxn_False_True_False_True
+b updateState
+l2_LF_svsLoad_3:
+dup
+extract 0 32
+store 17 // v2455
+dup
+extract 32 128
+store 16 // s/2461
+int 160
+extract_uint64
+store 14 // netBalance/2465
+retsub
+l4_LF_fromSome:
+dup
+extract 1 0
+swap
+int 0
+getbyte
+select
+retsub
+l3_LF_mapRef:
+box_get
+dup
+itob
+substring 7 8
+bury 4
+select
+concat
+retsub
+l16_LF_mapSet:
+swap
+dup
+box_len
+bnz l25_boxSet
+dig 3
+callsub l1_LF_mbrAdd
+b l25_boxSet
+l18_LF_checkUInt256ResultLen:
+dup
+len
+int 32
+swap
+-
+bzero
+swap
+concat
+retsub
+l17_LF_mapDel:
+box_del
+int 0
+cover 2
+select
+l24_LF_mbrSub:
+load 7 // GV_mbrSub :: UInt
++
+store 7 // GV_mbrSub :: UInt
+retsub
+l0_LF_wasntMeth:
+int 1
+store 3 // GV_wasntMeth :: Bool
+retsub
+l5_LF_timeCheck:
+dup
+int 0
+==
+swap
+load 2 // GV_currentTime :: UInt
+==
+||
+assert
+retsub
+l22_LF_updateMbr:
+load 6 // GV_mbrAdd :: UInt
+load 7 // GV_mbrSub :: UInt
+dup2
+>=
+bz updateMbr_neg
+b updateMbr_pos_eq
+l20_LF_makeTxn_False_False_False_True:
+itxn_begin
+b l26_LF_makeTxnK_False_True
+l1_LF_mbrAdd:
+load 6 // GV_mbrAdd :: UInt
++
+store 6 // GV_mbrAdd :: UInt
+retsub
+l23_LF_makeTxn_False_True_False_True:
+itxn_begin
+itxn_field CloseRemainderTo
+b l26_LF_makeTxnK_False_True
