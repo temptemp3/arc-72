@@ -49,8 +49,7 @@ export const ARC72 = Reach.App(() => {
     Bytes.fromHex("0x53f02a40"), // ARC-72 Core
     Bytes.fromHex("0xc3c1f000"), // ARC-72 Metadata
     Bytes.fromHex("0xb9c6f696"), // ARC-72 Transfer Management
-    Bytes.fromHex("0xef470855"), // ARC-72 Enumeration
-    Bytes.fromHex("0x4e22a3ba"), // ARC-73 Supported
+    Bytes.fromHex("0xa57d4679"), // ARC-72 Enumeration
   ];
   const D = Participant("Deployer", {
     params: Params,
