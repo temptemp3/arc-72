@@ -49,8 +49,7 @@ export const ARC72 = Reach.App(() => {
     Bytes.fromHex("0x53f02a40"), // ARC-72 Core
     Bytes.fromHex("0xc3c1f000"), // ARC-72 Metadata
     Bytes.fromHex("0xb9c6f696"), // ARC-72 Transfer Management
-    Bytes.fromHex("0xef470855"), // ARC-72 Enumeration
-    Bytes.fromHex("0x4e22a3ba"), // ARC-73 Supported
+    Bytes.fromHex("0xa57d4679"), // ARC-72 Enumeration
   ];
   const D = Participant("Deployer", {
     params: Params,
@@ -58,21 +57,22 @@ export const ARC72 = Reach.App(() => {
   });
   const A = API({
     // ARC72 Core API
-    arc72_transferFrom: Fun([Address, Address, UInt256], Null),
+    arc72_transferFrom: Fun([Address, Address, UInt256], Null), // modifies nftData, holderData
     // ARC72 Transfer Management Extension API
-    arc72_approve: Fun([Address, UInt256], Null),
-    arc72_setApprovalForAll: Fun([Address, Bool], Null), // requires mod: byte to bool in teal
+    arc72_approve: Fun([Address, UInt256], Null), // modifies nftData
+    arc72_setApprovalForAll: Fun([Address, Bool], Null), // requires mod: byte to bool in teal; modifed operatorData
     // Admin API
     grant: Fun([Address], Null),
     // Mint API
-    mintTo: Fun([Address, MetadataURI], UInt256),
+    mintTo: Fun([Address, MetadataURI], UInt256), // modifies nftData, holderData
     // Burn API
-    burn: Fun([UInt256], Null),
+    burn: Fun([UInt256], Null), // modifies nftData, holderData
     // Touch API
     touch: Fun([], Null),
     // Box API
-    deleteNftDataBox: Fun([UInt256], Null),
-    deleteOperatorDataBox: Fun([Address, Address], Null),
+    deleteNftDataBox: Fun([UInt256], Null), // modifies nftData
+    deleteOperatorDataBox: Fun([Address, Address], Null), // modifies operatorData
+    deleteHolderDataBox: Fun([Address], Null), // modifies holderData
     // Close API
     close: Fun([], Null),
   });
@@ -123,10 +123,17 @@ export const ARC72 = Reach.App(() => {
   // ---------------------------------------------
   const operatorData = new Map(Tuple(Address, Address), Bool);
   // ---------------------------------------------
+  // holderData is [holderAddress]
+  const holderData = new Map(Address, UInt256);
+  // ---------------------------------------------
   // getTokenById :: UInt256 -> Bool
   const tokenExists = (tokenId) => isSome(nftData[tokenId]);
   // getTokenById :: UInt256 -> NFTData
   const getTokenById = (tokenId) => fromSome(nftData[tokenId], invalidToken);
+  // balanceOf :: Address -> UInt256
+  const balanceOf = (addr) => fromSome(holderData[addr], UInt256(0));
+  // tokenByIndex :: UInt256 -> UInt256
+  const tokenByIndex = (index) => index;
   // ownerOf :: UInt256 -> Address
   const ownerOf = (tokenId) => getTokenById(tokenId).owner;
   // getApprovedById :: UInt256 -> Address
@@ -191,8 +198,8 @@ export const ARC72 = Reach.App(() => {
       V.arc72_getApproved.set(approvedOf);
       V.arc72_isApprovedForAll.set(getApprovalForAll);
       V.arc72_totalSupply.set(() => s.totalSupply);
-      V.arc72_balanceOf.set((_) => UInt256(0)); // TODO not yet implemented
-      V.arc72_tokenByIndex.set((_) => UInt256(0)); // TODO not yet implemented
+      V.arc72_balanceOf.set(balanceOf);
+      V.arc72_tokenByIndex.set(tokenByIndex);
       V.supportsInterface.set(supportsInterface(supportedInterfaces));
       V.manager.set(currentManager);
       V.state.set(() => State.fromObject(s));
@@ -216,7 +223,7 @@ export const ARC72 = Reach.App(() => {
     // owner of token initialized to addr
     // approved of token initialized to zero address
     .api_(A.mintTo, (addr, muri) => {
-      check(s.manager == this, "must be admin to mint to address");
+      check(isManager(this), "must be manager to mint");
       check(s.nMinted <= UInt256(maxNftId), "already minted max NFT");
       const tokenId = s.nMinted + UInt256(1); //
       const newTotalSupply = s.totalSupply + UInt256(1);
@@ -227,6 +234,7 @@ export const ARC72 = Reach.App(() => {
             owner: addr,
             approved: p.zeroAddress, // The zero address indicates there is no approved address
           });
+          holderData[addr] = balanceOf(addr) + UInt256(1);
           // arc72_Transfer event SHOULD emit with from being zero address when first minted
           N.arc72_Transfer(p.zeroAddress, addr, tokenId);
           k(tokenId);
@@ -273,6 +281,8 @@ export const ARC72 = Reach.App(() => {
             approved: p.zeroAddress, // arc72_Transfer event emits, this also indicates no approved addresss
             tokenURI: tokenURI(tokenId),
           });
+          holderData[addrFrom] = balanceOf(addrFrom) - UInt256(1);
+          holderData[addrTo] = balanceOf(addrTo) + UInt256(1);
           // arc72_transferFrom MUST emit Transfer event when a transfer is successful
           N.arc72_Transfer(addrFrom, addrTo, tokenId);
           k(null);
@@ -324,6 +334,7 @@ export const ARC72 = Reach.App(() => {
       return [
         (k) => {
           delete nftData[tokenId];
+          holderData[this] = balanceOf(this) - UInt256(1);
           // arc72_transferFrom SHOULD emit with to being zero address when burned
           N.arc72_Transfer(this, p.zeroAddress, tokenId);
           k(null);
@@ -367,6 +378,19 @@ export const ARC72 = Reach.App(() => {
       return [
         (k) => {
           delete operatorData[[owner, operator]];
+          k(null);
+          return [s];
+        },
+      ];
+    })
+    // (manager) api: deleteHolderDataBox (holder) -> null
+    // - manager can delete holder data box
+    .api_(A.deleteHolderDataBox, (holder) => {
+      check(isManager(this), "must be manager to delete holder data box");
+      check(balanceOf(holder) == UInt256(0), "must have zero balance");
+      return [
+        (k) => {
+          delete holderData[holder];
           k(null);
           return [s];
         },

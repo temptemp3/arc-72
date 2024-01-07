@@ -1,5 +1,5 @@
 import { loadStdlib, test } from "@reach-sh/stdlib";
-import * as backend from "./build/index.main.mjs";
+import * as backend from "./build/index.arc72d.mjs";
 
 // import CONTRACT from "arccjs";
 // import template from "./template.json" assert { type: "json" };
