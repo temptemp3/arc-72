@@ -8,3 +8,5 @@ np.sh
 node_modules
 teal
 mod.teal*
+.reach
+.DS_Store
