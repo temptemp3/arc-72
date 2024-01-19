@@ -281,19 +281,22 @@ export const ARC72 = Reach.App(() => {
     // MUST succeed for when called by an address that isi approved for the given NFT or approved as operator for the owner.
     //
     .api_(A.arc72_transferFrom, (addrFrom, addrTo, tokenId) => {
-      check(tokenExists(tokenId), "nft must exist");
+      check(tokenExists(tokenId), "ARC72: nft must exist");
       // arc72_transferFrom MUST error when from is not owner
-      check(addrFrom != ownerOf(tokenId), "ARC72: must be owner or operator");
+      check(addrFrom == ownerOf(tokenId), "ARC72: must be owner or operator");
       // arc72_transferFrom MUST error unless called by owner or approved operator
       check(
         this === ownerOf(tokenId) || operatorOf(tokenId, this),
         "ARC72: must be owner or operator to transfer"
       );
-      check(addrFrom != addrTo, "must transfer to different address");
-      check(addrFrom == p.zeroAddress, "must not transfer from zero address");
-      check(addrTo == p.zeroAddress, "must not be burned");
+      check(addrFrom != addrTo, "ARC72: must transfer to different address");
       check(
-        addrTo == approvedOf(tokenId),
+        addrFrom != p.zeroAddress,
+        "ARC72: must not transfer from zero address"
+      );
+      check(addrTo != p.zeroAddress, "ARC72: must not transfer to zero address"); 
+      check(
+        addrTo != approvedOf(tokenId),
         "must not be sent to approved address"
       );
       check(
